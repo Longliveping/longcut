@@ -61,7 +61,10 @@ GRANT EXECUTE ON FUNCTION public.consume_topup_credit(uuid)
   TO authenticated, service_role;
 
 -- Aggregate usage in a window for faster API queries
-CREATE OR REPLACE FUNCTION public.get_usage_breakdown(
+-- Drop the old function first to allow signature change
+DROP FUNCTION IF EXISTS public.get_usage_breakdown(uuid, timestamptz, timestamptz);
+
+CREATE FUNCTION public.get_usage_breakdown(
   p_user_id uuid,
   p_start timestamptz,
   p_end timestamptz

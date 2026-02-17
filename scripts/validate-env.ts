@@ -86,13 +86,14 @@ function validateRequiredEnvVars(): ValidationResult {
   }
 
   const preferredProvider =
-    process.env.AI_PROVIDER ?? process.env.NEXT_PUBLIC_AI_PROVIDER ?? 'grok';
+    process.env.AI_PROVIDER ?? process.env.NEXT_PUBLIC_AI_PROVIDER ?? 'openai';
   const hasGrokKey = !!process.env.XAI_API_KEY?.trim();
   const hasGeminiKey = !!process.env.GEMINI_API_KEY?.trim();
+  const hasOpenAIKey = !!process.env.OPENAI_API_KEY?.trim();
 
-  if (!hasGrokKey && !hasGeminiKey) {
+  if (!hasGrokKey && !hasGeminiKey && !hasOpenAIKey) {
     errors.push(
-      'Missing AI provider key: set XAI_API_KEY for Grok or GEMINI_API_KEY for Gemini.'
+      'Missing AI provider key: set XAI_API_KEY for Grok, GEMINI_API_KEY for Gemini, or OPENAI_API_KEY for OpenAI.'
     );
   }
 
@@ -105,6 +106,12 @@ function validateRequiredEnvVars(): ValidationResult {
   if (preferredProvider === 'gemini' && !hasGeminiKey) {
     errors.push(
       'AI_PROVIDER is set to "gemini" but GEMINI_API_KEY is missing.'
+    );
+  }
+
+  if (preferredProvider === 'openai' && !hasOpenAIKey) {
+    errors.push(
+      'AI_PROVIDER is set to "openai" but OPENAI_API_KEY is missing.'
     );
   }
 

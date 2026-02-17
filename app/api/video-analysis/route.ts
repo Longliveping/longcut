@@ -207,7 +207,7 @@ async function handler(req: NextRequest) {
         const response = respondWithNoCredits(
           {
             error: 'Sign in to analyze videos',
-            message: 'You have used your free preview. Create a free account for 3 videos/month or upgrade for more.',
+            message: 'You have used your free preview. Create a free account for 100 videos/month or upgrade for more.',
             requiresAuth: true,
             redirectTo: '/?auth=signup'
           },
@@ -256,7 +256,7 @@ async function handler(req: NextRequest) {
           statusCode = 402;
         } else if (tier === 'free') {
           upgradeMessage =
-            "You've used all 3 free videos this month. Upgrade to Pro for 100 videos/month ($9.99/mo).";
+            "You've used all 100 free videos this month. Upgrade to Pro for 100 videos/month ($9.99/mo).";
         } else if (tier === 'pro') {
           if (generationDecision.requiresTopupPurchase) {
             upgradeMessage =

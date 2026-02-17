@@ -40,8 +40,8 @@ import { toast } from "sonner";
 import { hasSpeakerMetadata } from "@/lib/transcript-export";
 import { buildSuggestedQuestionFallbacks } from "@/lib/suggested-question-fallback";
 
-const GUEST_LIMIT_MESSAGE = "You've used your free preview. Create a free account for 3 videos/month.";
-const AUTH_LIMIT_MESSAGE = "You've used all 3 free videos this month. Upgrade to Pro for 100 videos/month.";
+const GUEST_LIMIT_MESSAGE = "You've used your free preview. Create a free account for 100 videos/month.";
+const AUTH_LIMIT_MESSAGE = "You've used all 100 free videos this month. Upgrade to Pro for 100 videos/month.";
 const DEFAULT_CLIENT_ERROR = "Something went wrong. Please try again.";
 
 type LimitCheckResponse = {

@@ -10,7 +10,21 @@
     "validate-env": "tsx scripts/validate-env.ts",
     "stripe:smoke": "node scripts/stripe-smoke.mjs",
     "stripe:setup-portal": "tsx scripts/setup-stripe-portal.ts",
-    "stripe:create-prices": "tsx scripts/create-new-prices.ts"
+    "stripe:create-prices": "tsx scripts/create-new-prices.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:sign-in": "playwright test e2e/auth/tests/sign-in.spec.ts",
+    "test:e2e:sign-up": "playwright test e2e/auth/tests/sign-up.spec.ts",
+    "test:e2e:sign-out": "playwright test e2e/auth/tests/sign-out.spec.ts",
+    "test:e2e:session": "playwright test e2e/auth/tests/session-persistence.spec.ts",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "test:e2e:webkit": "playwright test --project=webkit",
+    "test:e2e:mobile": "playwright test --project=\"Mobile Chrome\"",
+    "test:e2e:report": "playwright show-report test-results/html-report",
+    "test:e2e:install": "playwright install --with-deps chromium firefox webkit"
   },
   "dependencies": {
     "@google-cloud/translate": "^9.2.1",
@@ -56,6 +70,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

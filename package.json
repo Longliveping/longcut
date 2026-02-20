@@ -25,10 +25,10 @@
     "test:e2e:mobile": "playwright test --project=\"Mobile Chrome\"",
     "test:e2e:report": "playwright show-report test-results/html-report",
     "test:e2e:install": "playwright install --with-deps chromium firefox webkit",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test": "cross-env NODE_ENV=test vitest",
+    "test:ui": "cross-env NODE_ENV=test vitest --ui",
+    "test:run": "cross-env NODE_ENV=test vitest run",
+    "test:coverage": "cross-env NODE_ENV=test vitest run --coverage"
   },
   "dependencies": {
     "@google-cloud/translate": "^9.2.1",

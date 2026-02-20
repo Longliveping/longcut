@@ -20,7 +20,7 @@ test_send_chat_message() {
 
   # Find and click Chat tab
   local snapshot=$(ab_snapshot)
-  local chat_tab_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name == "Chat") | .key' | head -1)
+  local chat_tab_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name == "Chat") | .key' | head -1)
 
   if [[ -z "$chat_tab_ref" ]]; then
     fail "Could not find Chat tab"
@@ -34,7 +34,7 @@ test_send_chat_message() {
 
   # Find chat input
   snapshot=$(ab_snapshot)
-  local chat_input_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.role == "textbox") | .key' | head -1)
+  local chat_input_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "textbox") | .key' | head -1)
 
   if [[ -z "$chat_input_ref" ]]; then
     fail "Could not find chat input"
@@ -50,7 +50,7 @@ test_send_chat_message() {
 
   # Find and click send button or press Enter
   snapshot=$(ab_snapshot)
-  local send_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name | test("Send|Submit|→"; "i")) | .key' | head -1)
+  local send_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("Send|Submit|→"; "i")) | .key' | head -1)
 
   if [[ -n "$send_ref" ]]; then
     ab_click "@$send_ref"
@@ -68,7 +68,7 @@ test_send_chat_message() {
 
   # Verify response appeared
   snapshot=$(ab_snapshot)
-  local content_count=$(echo "$snapshot" | jq -r '.refs | length')
+  local content_count=$(echo "$snapshot" | jq -r '.data.refs | length')
 
   if [[ "$content_count" -gt 5 ]]; then
     pass "Chat response received"
@@ -86,7 +86,7 @@ test_click_citation() {
   local snapshot=$(ab_snapshot)
 
   # Look for citation-like elements (timestamps)
-  local citation_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name | test("\\d+:\\d+"; "i") or .value.role == "link") | .key' | head -1)
+  local citation_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("\\d+:\\d+"; "i") or .value.role == "link") | .key' | head -1)
 
   if [[ -z "$citation_ref" ]]; then
     info "No citation found (may need actual AI response with citations)"
@@ -110,7 +110,7 @@ test_tab_switching() {
 
   for tab in "${tabs[@]}"; do
     local snapshot=$(ab_snapshot)
-    local tab_ref=$(echo "$snapshot" | jq -r --arg tab "$tab" '.refs | to_entries[] | select(.value.name == $tab) | .key' | head -1)
+    local tab_ref=$(echo "$snapshot" | jq -r --arg tab "$tab" '.data.refs | to_entries[] | select(.value.name == $tab) | .key' | head -1)
 
     if [[ -n "$tab_ref" ]]; then
       ab_click "@$tab_ref"

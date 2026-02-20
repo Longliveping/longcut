@@ -22,7 +22,7 @@ test_analyze_new_video() {
 
   # Find URL input using snapshot
   local snapshot=$(ab_snapshot)
-  local input_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.role == "textbox") | .key' | head -1)
+  local input_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "textbox") | .key' | head -1)
 
   if [[ -z "$input_ref" ]]; then
     fail "Could not find URL input field"
@@ -35,7 +35,7 @@ test_analyze_new_video() {
 
   # Find and click submit button
   snapshot=$(ab_snapshot)
-  local submit_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name | test("Analyze|Submit"; "i")) | .key' | head -1)
+  local submit_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("Analyze|Submit"; "i")) | .key' | head -1)
 
   if [[ -n "$submit_ref" ]]; then
     ab_click "@$submit_ref"
@@ -63,7 +63,7 @@ test_analyze_new_video() {
   ab_wait "$WAIT_LOAD"
 
   snapshot=$(ab_snapshot)
-  local has_content=$(echo "$snapshot" | jq -r '.refs | length')
+  local has_content=$(echo "$snapshot" | jq -r '.data.refs | length')
   if [[ "$has_content" -gt 5 ]]; then
     pass "Page has content after analysis"
   else
@@ -81,7 +81,7 @@ test_playback_topic() {
   test_case "Click topic to play video segment"
 
   local snapshot=$(ab_snapshot)
-  local topic_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.role == "link" or .value.role == "button") | .key' | head -1)
+  local topic_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "link" or .value.role == "button") | .key' | head -1)
 
   if [[ -z "$topic_ref" ]]; then
     info "No clickable topic found (may still be loading)"
@@ -96,7 +96,7 @@ test_playback_topic() {
 
   # Check for video/iframe
   snapshot=$(ab_snapshot)
-  local has_video=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.role == "iframe" or .value.name | test("video|player"; "i")) | .key' | wc -l)
+  local has_video=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "iframe" or .value.name | test("video|player"; "i")) | .key' | wc -l)
 
   if [[ "$has_video" -gt 0 ]]; then
     pass "Video player element found"

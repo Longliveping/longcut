@@ -19,7 +19,7 @@ test_open_auth_modal() {
 
   # Find and click sign in button
   local snapshot=$(ab_snapshot)
-  local signin_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name | test("Sign in|Login"; "i")) | .key' | head -1)
+  local signin_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("Sign in|Login"; "i")) | .key' | head -1)
 
   if [[ -z "$signin_ref" ]]; then
     fail "Could not find sign in button"
@@ -35,7 +35,7 @@ test_open_auth_modal() {
 
   # Verify modal is open
   snapshot=$(ab_snapshot)
-  local has_modal=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.role == "dialog") | .key' | wc -l)
+  local has_modal=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "dialog") | .key' | wc -l)
 
   if [[ "$has_modal" -gt 0 ]]; then
     pass "Auth modal is open"
@@ -53,7 +53,7 @@ test_sign_in() {
   local snapshot=$(ab_snapshot)
 
   # Switch to sign in tab if needed
-  local signin_tab_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name == "Sign in") | .key' | head -1)
+  local signin_tab_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name == "Sign in") | .key' | head -1)
   if [[ -n "$signin_tab_ref" ]]; then
     ab_click "@$signin_tab_ref"
     ab_wait "$WAIT_SHORT"
@@ -61,7 +61,7 @@ test_sign_in() {
 
   # Find email input
   snapshot=$(ab_snapshot)
-  local email_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.role == "textbox") | .key' | head -1)
+  local email_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "textbox") | .key' | head -1)
 
   if [[ -z "$email_ref" ]]; then
     fail "Could not find email input"
@@ -73,7 +73,7 @@ test_sign_in() {
 
   # Find password input (second textbox)
   snapshot=$(ab_snapshot)
-  local password_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.role == "textbox") | .key' | sed -n '2p')
+  local password_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "textbox") | .key' | sed -n '2p')
 
   if [[ -n "$password_ref" ]]; then
     ab_fill "@$password_ref" "$TEST_USER_PASSWORD"
@@ -84,7 +84,7 @@ test_sign_in() {
 
   # Find and click submit button
   snapshot=$(ab_snapshot)
-  local submit_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name == "Sign In") | .key' | head -1)
+  local submit_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name == "Sign In") | .key' | head -1)
 
   if [[ -n "$submit_ref" ]]; then
     ab_click "@$submit_ref"
@@ -108,7 +108,7 @@ test_sign_out() {
 
   # Check if user menu exists (signed in)
   local snapshot=$(ab_snapshot)
-  local menu_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name | test("account|profile|menu"; "i")) | .key' | head -1)
+  local menu_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("account|profile|menu"; "i")) | .key' | head -1)
 
   if [[ -z "$menu_ref" ]]; then
     info "No user menu found (not signed in) - skipping sign out"
@@ -122,7 +122,7 @@ test_sign_out() {
 
   # Find sign out button
   snapshot=$(ab_snapshot)
-  local signout_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name | test("Sign out|Logout"; "i")) | .key' | head -1)
+  local signout_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("Sign out|Logout"; "i")) | .key' | head -1)
 
   if [[ -n "$signout_ref" ]]; then
     ab_click "@$signout_ref"
@@ -149,7 +149,7 @@ test_favorite_video() {
 
   # Look for favorite button
   local snapshot=$(ab_snapshot)
-  local fav_ref=$(echo "$snapshot" | jq -r '.refs | to_entries[] | select(.value.name | test("favorite|bookmark|save"; "i")) | .key' | head -1)
+  local fav_ref=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("favorite|bookmark|save"; "i")) | .key' | head -1)
 
   if [[ -z "$fav_ref" ]]; then
     info "Favorite button not found (may require authentication)"

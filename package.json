@@ -26,9 +26,13 @@
     "test:e2e:report": "playwright show-report test-results/html-report",
     "test:e2e:install": "playwright install --with-deps chromium firefox webkit",
     "test": "cross-env NODE_ENV=test vitest",
-    "test:ui": "cross-env NODE_ENV=test vitest --ui",
+    "test:agent": "cd e2e/agent-browser && ./run-all.sh",
+    "test:agent:auth": "cd e2e/agent-browser && ./tests/03-auth-flows.sh",
+    "test:agent:chat": "cd e2e/agent-browser && ./tests/02-ai-chat.sh",
+    "test:agent:video": "cd e2e/agent-browser && ./tests/01-video-analysis.sh",
+    "test:coverage": "cross-env NODE_ENV=test vitest run --coverage",
     "test:run": "cross-env NODE_ENV=test vitest run",
-    "test:coverage": "cross-env NODE_ENV=test vitest run --coverage"
+    "test:ui": "cross-env NODE_ENV=test vitest --ui"
   },
   "dependencies": {
     "@google-cloud/translate": "^9.2.1",

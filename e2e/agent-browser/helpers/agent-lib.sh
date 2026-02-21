@@ -33,6 +33,19 @@ ab_wait() {
   agent-browser wait "$1"
 }
 
+# Wait for a longer duration by looping (agent-browser has ~5s limit per wait)
+# Usage: ab_wait_long <iterations> <wait_ms_per_iteration>
+ab_wait_long() {
+  local iterations="${1:-$WAIT_ITERATIONS}"
+  local wait_ms="${2:-$WAIT_LOAD}"
+  local iteration=0
+
+  while [[ $iteration -lt $iterations ]]; do
+    ab_wait "$wait_ms"
+    ((iteration++)) || true
+  done
+}
+
 ab_screenshot() {
   local path="$1"
   mkdir -p "$(dirname "$path")"
@@ -41,6 +54,14 @@ ab_screenshot() {
 
 ab_close() {
   agent-browser close 2>/dev/null || true
+}
+
+# Clear cookies by navigating to a blank page (resets guest tracking)
+ab_reset_cookies() {
+  ab_open "about:blank"
+  ab_wait "$WAIT_SHORT"
+  # This effectively clears cookies by starting a new session on next open
+  ab_close
 }
 
 ab_press() {

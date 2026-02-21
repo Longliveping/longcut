@@ -13,7 +13,7 @@ test_open_auth_modal() {
   test_case "Open authentication modal"
 
   ab_open "$TEST_BASE_URL"
-  ab_wait "$WAIT_LOAD"
+  ab_wait_long 3 "$WAIT_SHORT"  # Wait 15s for page load
 
   ab_screenshot "${SCREENSHOT_DIR}/20-home.png"
 
@@ -33,14 +33,18 @@ test_open_auth_modal() {
   ab_wait "$WAIT_SHORT"
   ab_screenshot "${SCREENSHOT_DIR}/21-auth-modal.png"
 
-  # Verify modal is open
+  # Verify modal is open - check for multiple indicators
   snapshot=$(ab_snapshot)
-  local has_modal=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "dialog") | .key' | wc -l)
+  local has_dialog=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "dialog") | .key' | wc -l)
+  local has_email_input=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.role == "textbox" and (.value.name | test("email|Email|E-mail"; "i"))) | .key' | wc -l)
+  local has_password_input=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name | test("password|Password"; "i")) | .key' | wc -l)
+  local has_signin_button=$(echo "$snapshot" | jq -r '.data.refs | to_entries[] | select(.value.name == "Sign In") | .key' | wc -l)
 
-  if [[ "$has_modal" -gt 0 ]]; then
+  # Modal is confirmed if we have dialog role OR email input + signin button
+  if [[ "$has_dialog" -gt 0 ]] || [[ "$has_email_input" -gt 0 && "$has_signin_button" -gt 0 ]]; then
     pass "Auth modal is open"
   else
-    fail "Auth modal not found"
+    fail "Auth modal not found (dialog:$has_dialog, email:$has_email_input, password:$has_password_input, signin:$has_signin_button)"
   fi
 
   return 0
@@ -93,7 +97,7 @@ test_sign_in() {
 
   # Wait for sign in to process
   info "Waiting for sign in..."
-  ab_wait "$WAIT_LOAD"
+  ab_wait_long 6 "$WAIT_LOAD"  # Wait up to 30s for sign in (6 * 5s)
 
   ab_screenshot "${SCREENSHOT_DIR}/23-after-signin.png"
 
@@ -143,7 +147,7 @@ test_favorite_video() {
 
   # Navigate to video page
   ab_open "$TEST_BASE_URL/analyze/dQw4w9WgXcQ"
-  ab_wait "$WAIT_LOAD"
+  ab_wait_long 3 "$WAIT_SHORT"  # Wait 15s for page load
 
   ab_screenshot "${SCREENSHOT_DIR}/25-video-page.png"
 

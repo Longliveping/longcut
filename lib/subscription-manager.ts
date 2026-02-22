@@ -54,6 +54,7 @@ export interface GenerationDecision {
 export const TIER_LIMITS: Record<SubscriptionTier, number> = {
   free: 100,
   pro: 100,
+  enterprise: 500,
 };
 
 const BILLING_PERIOD_DAYS = 30;

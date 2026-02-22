@@ -4,6 +4,11 @@ import { createContext, useContext, useEffect, useState, useRef, useCallback, us
 import { clearCSRFToken } from '@/lib/csrf-client'
 
 interface User {
+  user_metadata?: {
+    avatar_url?: string
+    full_name?: string
+    name?: string
+  }
   id: string
   email: string
   name?: string | null

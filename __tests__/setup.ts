@@ -3,7 +3,6 @@ import { vi } from 'vitest'
 // Global test setup for API testing
 
 // Mock environment variables for tests
-process.env.NODE_ENV = 'test'
 process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
 
 // Suppress console output during tests unless explicitly needed

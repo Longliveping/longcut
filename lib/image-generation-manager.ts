@@ -25,6 +25,7 @@ type DatabaseClient = SupabaseClient<any, string, any>;
 export const IMAGE_TIER_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
   pro: 100,
+  enterprise: 500,
 };
 
 const BILLING_PERIOD_DAYS = 30;

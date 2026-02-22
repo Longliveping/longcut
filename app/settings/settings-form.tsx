@@ -35,8 +35,8 @@ interface Profile {
   updated_at: string
 }
 
-type SubscriptionTier = 'free' | 'pro'
-type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | null
+type SubscriptionTier = 'free' | 'pro' | 'enterprise'
+type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'unpaid' | null
 
 interface SubscriptionSummary {
   tier: SubscriptionTier

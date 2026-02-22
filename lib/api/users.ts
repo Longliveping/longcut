@@ -11,8 +11,10 @@ export async function createUser(data: {
   const user = {
     id: crypto.randomUUID(),
     email: data.email,
+    emailVerified: false,
     passwordHash: data.passwordHash,
     name: data.name || null,
+    image: null,
     createdAt: now,
     updatedAt: now,
   }
@@ -36,5 +38,5 @@ export async function updateUser(userId: string, data: { name?: string }) {
     .set({ ...data, updatedAt: now })
     .where(eq(users.id, userId))
     .returning()
-  return result[0]
+  return result[0] || null
 }

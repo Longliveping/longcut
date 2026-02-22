@@ -2,13 +2,39 @@ import { auth } from '@/lib/auth/config'
 import { headers } from 'next/headers'
 
 export async function POST(req: Request) {
-  const body = await req.json()
-  const result = await auth.api.signInEmail({
-    body: {
-      email: body.email,
-      password: body.password,
-    },
-    headers: await headers(),
-  })
-  return Response.json(result)
+  try {
+    const body = await req.json()
+    
+    // Basic validation
+    if (!body.email || !body.password) {
+      return Response.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      )
+    }
+    
+    const result = await auth.api.signInEmail({
+      body: {
+        email: body.email,
+        password: body.password,
+      },
+      headers: await headers(),
+    })
+    
+    // Check for error in result
+    if (result.error) {
+      return Response.json(
+        { error: result.error.message || 'Authentication failed' },
+        { status: 401 }
+      )
+    }
+    
+    return Response.json(result)
+  } catch (error) {
+    console.error('Sign-in error:', error)
+    return Response.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
 }

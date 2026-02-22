@@ -20,9 +20,25 @@ import { NO_CREDITS_USED_MESSAGE } from '@/lib/no-credits-message';
 import { ensureMergedFormat } from '@/lib/transcript-format-detector';
 import { TranscriptSegment } from '@/lib/types';
 import { getGuestAccessState, recordGuestUsage, setGuestCookies } from '@/lib/guest-usage';
-import { saveVideoAnalysisWithRetry } from '@/lib/video-save-utils';
+import {
+  getVideoByYoutubeId,
+  createVideoAnalysis,
+  updateVideoAnalysis,
+  linkVideoToUser,
+  type VideoAnalysis
+} from '@/lib/api/videos';
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
+// Safe JSON parsing helper
+function safeJsonParse<T>(str: string | null): T | null {
+  if (!str) return null;
+  try {
+    return JSON.parse(str) as T;
+  } catch {
+    return null;
+  }
+}
 
 function respondWithNoCredits(
   payload: Record<string, unknown>,
@@ -78,6 +94,74 @@ async function hasCountedGenerationThisPeriod({
   return Boolean(data);
 }
 
+/**
+ * Saves video analysis to SQLite with proper user linking
+ */
+async function saveVideoAnalysisToSQLite(params: {
+  youtubeId: string;
+  title: string;
+  author: string | null;
+  duration: number;
+  thumbnailUrl: string | null;
+  transcript: TranscriptSegment[];
+  topics: unknown;
+  summary?: unknown;
+  suggestedQuestions?: unknown;
+  modelUsed?: string | null;
+  userId?: string | null;
+  language?: string | null;
+  availableLanguages?: unknown;
+}): Promise<{ success: boolean; videoId: string | null; error: string | null }> {
+  try {
+    // Check if video already exists
+    const existing = await getVideoByYoutubeId(params.youtubeId);
+
+    if (existing) {
+      // Update existing video
+      const updated = await updateVideoAnalysis(existing.id, {
+        transcript: params.transcript as TranscriptSegment[],
+        topics: params.topics,
+        summary: params.summary,
+        suggestedQuestions: params.suggestedQuestions as string[],
+      });
+
+      if (updated && params.userId) {
+        await linkVideoToUser(params.userId, existing.id);
+      }
+
+      return { success: true, videoId: updated?.id || existing.id, error: null };
+    }
+
+    // Create new video analysis
+    const newVideo = await createVideoAnalysis({
+      youtubeId: params.youtubeId,
+      userId: params.userId,
+      title: params.title,
+      author: params.author || undefined,
+      thumbnailUrl: params.thumbnailUrl || undefined,
+      duration: params.duration || undefined,
+      transcript: params.transcript,
+      topics: params.topics,
+      summary: params.summary,
+      suggestedQuestions: params.suggestedQuestions as string[],
+    });
+
+    // Link to user if provided
+    if (params.userId && newVideo?.id) {
+      await linkVideoToUser(params.userId, newVideo.id);
+    }
+
+    return { success: true, videoId: newVideo?.id || null, error: null };
+  } catch (error) {
+    console.error('Failed to save video analysis to SQLite:', error);
+    return {
+      success: false,
+      videoId: null,
+      error: error instanceof Error ? error.message : String(error)
+    };
+  }
+}
+
 async function handler(req: NextRequest) {
   try {
     // Parse and validate request body
@@ -116,18 +200,13 @@ async function handler(req: NextRequest) {
     const guestState = user ? null : await getGuestAccessState({ supabase });
     const unlimitedAccess = hasUnlimitedVideoAllowance(user);
 
-    let cachedVideo: any = null;
+    // Check SQLite cache first
+    let cachedVideo: VideoAnalysis | null = null;
     if (!forceRegenerate) {
-      const { data } = await supabase
-        .from('video_analyses')
-        .select('*')
-        .eq('youtube_id', videoId)
-        .single();
-
-      cachedVideo = data ?? null;
+      cachedVideo = await getVideoByYoutubeId(videoId);
     }
 
-    const isCachedAnalysis = Boolean(cachedVideo?.topics);
+    const isCachedAnalysis = Boolean(cachedVideo?.topics && safeJsonParse(cachedVideo.topics));
 
     let generationDecision: GenerationDecision | null = null;
     let alreadyCountedThisPeriod = false;
@@ -293,34 +372,32 @@ async function handler(req: NextRequest) {
       }
     }
 
-    // Serve cached analysis but still count credits when required
-    if (!forceRegenerate && cachedVideo && cachedVideo.topics) {
-      // If user is logged in, track their access to this video with retry logic
+    // Serve cached analysis from SQLite but still count credits when required
+    if (!forceRegenerate && cachedVideo && safeJsonParse(cachedVideo.topics)) {
+      const parsedTopics = safeJsonParse(cachedVideo.topics);
+      const parsedTranscript = safeJsonParse<TranscriptSegment[]>(cachedVideo.transcript);
+      const parsedSummary = safeJsonParse(cachedVideo.summary);
+      const parsedSuggestedQuestions = safeJsonParse<string[]>(cachedVideo.suggestedQuestions);
+
+      // If user is logged in, track their access to this video
       if (user) {
-        const saveResult = await saveVideoAnalysisWithRetry(supabase, {
+        const saveResult = await saveVideoAnalysisToSQLite({
           youtubeId: videoId,
           title: cachedVideo.title,
           author: cachedVideo.author,
-          duration: cachedVideo.duration,
-          thumbnailUrl: cachedVideo.thumbnail_url,
-          transcript: cachedVideo.transcript,
-          topics: cachedVideo.topics,
-          summary: cachedVideo.summary || null,
-          suggestedQuestions: cachedVideo.suggested_questions || null,
-          modelUsed: cachedVideo.model_used,
+          duration: cachedVideo.duration ?? 0,
+          thumbnailUrl: cachedVideo.thumbnailUrl,
+          transcript: parsedTranscript || [],
+          topics: parsedTopics,
+          summary: parsedSummary,
+          suggestedQuestions: parsedSuggestedQuestions,
           userId: user.id,
-          language: cachedVideo.language || null,
-          availableLanguages: cachedVideo.available_languages || null
         });
 
         if (!saveResult.success) {
           console.error(
             `[video-analysis] Failed to link cached video ${videoId} to user ${user.id}:`,
             saveResult.error
-          );
-        } else if (saveResult.retriedCount > 0) {
-          console.log(
-            `[video-analysis] Successfully saved cached video after ${saveResult.retriedCount} retries`
           );
         }
       }
@@ -363,26 +440,26 @@ async function handler(req: NextRequest) {
       }
 
       // Ensure transcript is in merged format (backward compatibility for old cached videos)
-      const originalTranscript = cachedVideo.transcript as TranscriptSegment[];
+      const originalTranscript = parsedTranscript || [];
       const migratedTranscript = ensureMergedFormat(originalTranscript, {
         enableLogging: true,
         context: `YouTube ID: ${videoId}`
       });
 
       const response = NextResponse.json({
-        topics: cachedVideo.topics,
+        topics: parsedTopics,
         transcript: migratedTranscript,
         videoInfo: {
           title: cachedVideo.title,
           author: cachedVideo.author,
           duration: cachedVideo.duration,
-          thumbnail: cachedVideo.thumbnail_url
+          thumbnail: cachedVideo.thumbnailUrl
         },
-        summary: cachedVideo.summary,
-        suggestedQuestions: cachedVideo.suggested_questions,
+        summary: parsedSummary,
+        suggestedQuestions: parsedSuggestedQuestions,
         themes,
         cached: true,
-        cacheDate: cachedVideo.created_at
+        cacheDate: new Date(cachedVideo.createdAt * 1000).toISOString()
       });
 
       if (!user && guestState) {
@@ -392,6 +469,7 @@ async function handler(req: NextRequest) {
       return response;
     }
 
+    // Generate new analysis
     const generationResult = await generateTopicsFromTranscript(
       transcript,
       {
@@ -418,9 +496,8 @@ async function handler(req: NextRequest) {
       console.error('Error generating themes:', error);
     }
 
-    // Save analysis to database FIRST (before consuming credit)
-    // This ensures credits are only consumed if save succeeds
-    const saveResult = await saveVideoAnalysisWithRetry(supabase, {
+    // Save analysis to SQLite database FIRST (before consuming credit)
+    const saveResult = await saveVideoAnalysisToSQLite({
       youtubeId: videoId,
       title: videoInfo?.title || `YouTube Video ${videoId}`,
       author: videoInfo?.author || null,
@@ -441,10 +518,6 @@ async function handler(req: NextRequest) {
       console.error(
         `[video-analysis] Failed to save new video ${videoId}:`,
         saveResult.error
-      );
-    } else if (saveResult.retriedCount > 0) {
-      console.log(
-        `[video-analysis] Successfully saved new video after ${saveResult.retriedCount} retries`
       );
     }
 

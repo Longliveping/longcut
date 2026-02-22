@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withSecurity } from '@/lib/security-middleware';
 import { RATE_LIMITS, RateLimiter, rateLimitResponse } from '@/lib/rate-limiter';
 import { getTranslationClient } from '@/lib/translation';
-import { createClient } from '@/lib/supabase/server';
+import { requireSession } from '@/lib/auth/server';
 import { z } from 'zod';
 import type { TranslationContext } from '@/lib/translation/types';
 
@@ -29,10 +29,8 @@ async function handler(request: NextRequest) {
     const body = requestBody;
 
     // Auth check first (cheap), then optional rate limiting
-    const supabase = await createClient();
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
+    const session = await requireSession();
+    const user = session.user;
 
     if (!user) {
       return NextResponse.json(

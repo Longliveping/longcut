@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1771742595298,
-      "tag": "0000_thankful_leader",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1771742662323,
-      "tag": "0001_illegal_celestials",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1771742800000,
-      "tag": "0002_helpful_smiles",
+      "when": 1771743067410,
+      "tag": "0000_young_swarm",
       "breakpoints": true
     }
   ]

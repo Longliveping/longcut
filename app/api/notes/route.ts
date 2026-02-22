@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getSession } from '@/lib/auth/server';
 import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
 import { formatValidationError, noteDeleteSchema, noteInsertSchema } from '@/lib/validation';
 import { z } from 'zod';
+import { getVideoByYoutubeId } from '@/lib/api/videos';
+import { getNotesByVideo, createNote as createNoteDb, deleteNote as deleteNoteDb } from '@/lib/api/notes';
 
 const getNotesQuerySchema = z.object({
   youtubeId: z.string().optional(),
@@ -13,37 +15,38 @@ const getNotesQuerySchema = z.object({
 
 interface NoteRow {
   id: string;
-  user_id: string;
-  video_id: string;
+  userId: string;
+  videoId: string;
   source: string;
-  source_id: string | null;
-  note_text: string;
+  sourceId: string | null;
+  text: string;
   metadata: any;
-  created_at: string;
-  updated_at: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 function mapNote(row: NoteRow) {
   return {
     id: row.id,
-    userId: row.user_id,
-    videoId: row.video_id,
+    userId: row.userId,
+    videoId: row.videoId,
     source: row.source,
-    sourceId: row.source_id,
-    text: row.note_text,
+    sourceId: row.sourceId,
+    text: row.text,
     metadata: row.metadata,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    createdAt: new Date(row.createdAt * 1000).toISOString(),
+    updatedAt: new Date(row.updatedAt * 1000).toISOString(),
   };
 }
 
 async function handler(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getSession();
 
-  if (!user) {
+  if (!session?.user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
+
+  const userId = session.user.id;
 
   if (req.method === 'GET') {
     const { searchParams } = new URL(req.url);
@@ -55,43 +58,22 @@ async function handler(req: NextRequest) {
 
       let targetVideoId: string | undefined;
 
-      // If videoId (UUID) is provided directly, skip the video_analyses lookup
+      // If videoId (UUID) is provided directly, skip the video lookup
       if (validated.videoId) {
         targetVideoId = validated.videoId;
       } else if (validated.youtubeId) {
-        // Fallback: lookup by youtube_id
-        const { data: videos, error: videoError } = await supabase
-          .from('video_analyses')
-          .select('id')
-          .eq('youtube_id', validated.youtubeId)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        if (videoError) {
-          throw videoError;
-        }
-
-        targetVideoId = videos?.[0]?.id;
+        // Lookup by youtube_id
+        const video = await getVideoByYoutubeId(validated.youtubeId);
+        targetVideoId = video?.id;
       }
 
       if (!targetVideoId) {
         return NextResponse.json({ notes: [] });
       }
 
-      const { data, error } = await supabase
-        .from('user_notes')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('video_id', targetVideoId)
-        .order('created_at', { ascending: false });
+      const notes = await getNotesByVideo(userId, targetVideoId);
 
-      if (error) {
-        throw error;
-      }
-
-      const notes = (data || []).map(mapNote);
-
-      return NextResponse.json({ notes });
+      return NextResponse.json({ notes: notes.map(mapNote) });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
@@ -115,23 +97,13 @@ async function handler(req: NextRequest) {
 
       let targetVideoId: string | undefined;
 
-      // If videoId (UUID) is provided directly, skip the video_analyses lookup
+      // If videoId (UUID) is provided directly, skip the video lookup
       if (validatedData.videoId) {
         targetVideoId = validatedData.videoId;
       } else if (validatedData.youtubeId) {
-        // Fallback: lookup by youtube_id
-        const { data: videos, error: videoError } = await supabase
-          .from('video_analyses')
-          .select('id')
-          .eq('youtube_id', validatedData.youtubeId)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        if (videoError) {
-          throw videoError;
-        }
-
-        targetVideoId = videos?.[0]?.id;
+        // Lookup by youtube_id
+        const video = await getVideoByYoutubeId(validatedData.youtubeId);
+        targetVideoId = video?.id;
       }
 
       if (!targetVideoId) {
@@ -141,24 +113,16 @@ async function handler(req: NextRequest) {
         );
       }
 
-      const { data: noteRow, error } = await supabase
-        .from('user_notes')
-        .insert({
-          user_id: user.id,
-          video_id: targetVideoId,
-          source: validatedData.source,
-          source_id: validatedData.sourceId || null,
-          note_text: validatedData.text,
-          metadata: validatedData.metadata || {}
-        })
-        .select()
-        .single();
+      const note = await createNoteDb({
+        userId,
+        videoId: targetVideoId,
+        source: validatedData.source,
+        sourceId: validatedData.sourceId,
+        text: validatedData.text,
+        metadata: validatedData.metadata
+      });
 
-      if (error) {
-        throw error;
-      }
-
-      return NextResponse.json({ note: mapNote(noteRow as NoteRow) }, { status: 201 });
+      return NextResponse.json({ note: mapNote(note as NoteRow) }, { status: 201 });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
@@ -180,14 +144,13 @@ async function handler(req: NextRequest) {
       const body = await req.json();
       const { noteId } = noteDeleteSchema.parse(body);
 
-      const { error } = await supabase
-        .from('user_notes')
-        .delete()
-        .eq('id', noteId)
-        .eq('user_id', user.id);
+      const deletedNote = await deleteNoteDb(noteId, userId);
 
-      if (error) {
-        throw error;
+      if (!deletedNote) {
+        return NextResponse.json(
+          { error: 'Note not found or not authorized' },
+          { status: 404 }
+        );
       }
 
       return NextResponse.json({ success: true });

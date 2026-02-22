@@ -1,83 +1,98 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getSession } from '@/lib/auth/server';
 import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
+import { getAllNotes } from '@/lib/api/notes';
+import { db } from '@/lib/db';
+import { videoAnalyses } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-interface NoteWithVideoRow {
+interface NoteRow {
   id: string;
-  user_id: string;
-  video_id: string;
+  userId: string;
+  videoId: string;
   source: string;
-  source_id: string | null;
-  note_text: string;
+  sourceId: string | null;
+  text: string;
   metadata: any;
-  created_at: string;
-  updated_at: string;
-  video_analyses: {
-    youtube_id: string;
-    title: string;
-    author: string;
-    thumbnail_url: string;
-    duration: number;
-    slug: string | null;
-  } | null;
+  createdAt: number;
+  updatedAt: number;
 }
 
-function mapNoteWithVideo(row: NoteWithVideoRow) {
+interface VideoAnalysis {
+  id: string;
+  youtubeId: string;
+  title: string;
+  author: string | null;
+  thumbnailUrl: string | null;
+  duration: number | null;
+}
+
+function mapNoteWithVideo(note: NoteRow, video: VideoAnalysis | null) {
   return {
-    id: row.id,
-    userId: row.user_id,
-    videoId: row.video_id,
-    source: row.source,
-    sourceId: row.source_id,
-    text: row.note_text,
-    metadata: row.metadata,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    video: row.video_analyses ? {
-      youtubeId: row.video_analyses.youtube_id,
-      title: row.video_analyses.title,
-      author: row.video_analyses.author,
-      thumbnailUrl: row.video_analyses.thumbnail_url,
-      duration: row.video_analyses.duration,
-      slug: row.video_analyses.slug,
+    id: note.id,
+    userId: note.userId,
+    videoId: note.videoId,
+    source: note.source,
+    sourceId: note.sourceId,
+    text: note.text,
+    metadata: note.metadata,
+    createdAt: new Date(note.createdAt * 1000).toISOString(),
+    updatedAt: new Date(note.updatedAt * 1000).toISOString(),
+    video: video ? {
+      youtubeId: video.youtubeId,
+      title: video.title,
+      author: video.author,
+      thumbnailUrl: video.thumbnailUrl,
+      duration: video.duration,
     } : null,
   };
 }
 
 async function handler(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getSession();
 
-  if (!user) {
+  if (!session?.user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
+  const userId = session.user.id;
+
   if (req.method === 'GET') {
     try {
-      // Fetch all notes for the user with video metadata
-      const { data, error } = await supabase
-        .from('user_notes')
-        .select(`
-          *,
-          video_analyses!inner(
-            youtube_id,
-            title,
-            author,
-            thumbnail_url,
-            duration,
-            slug
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      // Fetch all notes for the user
+      const notes = await getAllNotes(userId);
 
-      if (error) {
-        throw error;
-      }
+      // Get unique video IDs from notes
+      const videoIds = [...new Set(notes.map(note => note.videoId))];
 
-      const notes = (data || []).map(mapNoteWithVideo);
+      // Fetch all videos in parallel
+      const videos = await Promise.all(
+        videoIds.map(videoId =>
+          db.select().from(videoAnalyses).where(eq(videoAnalyses.id, videoId)).limit(1)
+        )
+      );
 
-      return NextResponse.json({ notes });
+      // Create a map of video ID to video data
+      const videoMap = new Map<string, VideoAnalysis>();
+      videos.forEach(result => {
+        if (result[0]) {
+          videoMap.set(result[0].id, {
+            id: result[0].id,
+            youtubeId: result[0].youtubeId,
+            title: result[0].title,
+            author: result[0].author,
+            thumbnailUrl: result[0].thumbnailUrl,
+            duration: result[0].duration,
+          });
+        }
+      });
+
+      // Map notes with video data, sorting by created_at descending
+      const notesWithVideo = notes
+        .map(note => mapNoteWithVideo(note as NoteRow, videoMap.get(note.videoId) || null))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      return NextResponse.json({ notes: notesWithVideo });
     } catch (error) {
       console.error('Error fetching all notes:', error);
       return NextResponse.json(

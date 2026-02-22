@@ -5,7 +5,7 @@ import {
   rateLimitResponse
 } from '@/lib/rate-limiter';
 import { AuditLogger, AuditAction } from '@/lib/audit-logger';
-import { createClient } from '@/lib/supabase/server';
+import { getSession } from '@/lib/auth/server';
 import {
   validateCSRF,
   injectCSRFToken,
@@ -48,13 +48,9 @@ export function withSecurity(
 
       // 2. Check authentication if required
       if (config.requireAuth) {
-        const supabase = await createClient();
-        const {
-          data: { user },
-          error
-        } = await supabase.auth.getUser();
+        const session = await getSession();
 
-        if (error || !user) {
+        if (!session?.user) {
           await AuditLogger.logSecurityEvent(AuditAction.UNAUTHORIZED_ACCESS, {
             endpoint: req.url
           });

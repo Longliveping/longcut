@@ -1,7 +1,16 @@
 import { db } from '../db'
 import { notes } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
-import type { Note, NoteSource } from '../types'
+import type { NoteSource } from '../types'
+
+function safeJsonParse<T>(value: string | null): T | null {
+  if (!value) return null
+  try {
+    return JSON.parse(value) as T
+  } catch {
+    return null
+  }
+}
 
 export async function createNote(data: {
   userId: string
@@ -36,7 +45,7 @@ export async function getNotesByVideo(userId: string, videoId: string) {
     ))
   return result.map(n => ({
     ...n,
-    metadata: n.metadata ? JSON.parse(n.metadata) : null,
+    metadata: safeJsonParse(n.metadata),
   }))
 }
 
@@ -46,7 +55,7 @@ export async function getAllNotes(userId: string) {
     .where(eq(notes.userId, userId))
   return result.map(n => ({
     ...n,
-    metadata: n.metadata ? JSON.parse(n.metadata) : null,
+    metadata: safeJsonParse(n.metadata),
   }))
 }
 

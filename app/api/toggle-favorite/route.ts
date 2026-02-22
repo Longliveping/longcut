@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { toggleFavoriteRequestSchema, formatValidationError } from '@/lib/validation';
 import { z } from 'zod';
 import { withSecurity } from '@/lib/security-middleware';
 import { RATE_LIMITS } from '@/lib/rate-limiter';
+import { requireSession } from '@/lib/auth/server';
+import { getVideoAnalysisByYoutubeId, setVideoFavorite } from '@/lib/api/videos';
 
 async function handler(req: NextRequest) {
   try {
@@ -28,56 +29,41 @@ async function handler(req: NextRequest) {
 
     const { videoId, isFavorite } = validatedData;
 
-    const supabase = await createClient();
-
-    // Get current user
-    // Authentication is handled by the security middleware
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      // This shouldn't happen as middleware checks authentication
+    // Get authenticated user
+    const session = await requireSession();
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    // First, get the video from video_analyses table using the YouTube ID
-    const { data: video, error: videoError } = await supabase
-      .from('video_analyses')
-      .select('id')
-      .eq('youtube_id', videoId)
-      .single();
-
-    if (videoError || !video) {
+    // Get the video analysis by YouTube ID
+    const video = await getVideoAnalysisByYoutubeId(videoId);
+    
+    if (!video) {
       return NextResponse.json(
         { error: 'Video not found' },
         { status: 404 }
       );
     }
 
-    // Use upsert to atomically update or insert the favorite status
-    // This prevents race conditions from concurrent requests
-    const { data, error } = await supabase
-      .from('user_videos')
-      .upsert({
-        user_id: user.id,
-        video_id: video.id,
-        is_favorite: isFavorite,
-        accessed_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id,video_id'
-      })
-      .select()
-      .single();
+    // Set favorite status (upsert logic handled by setVideoFavorite)
+    const result = await setVideoFavorite(session.user.id, video.id, isFavorite);
 
-    if (error) {
-      throw error;
+    if (!result) {
+      return NextResponse.json(
+        { error: 'Failed to update favorite status' },
+        { status: 500 }
+      );
     }
+
+    // Convert integer to boolean for response
+    const isFavoriteBool = result.isFavorite === 1;
 
     return NextResponse.json({
       success: true,
-      isFavorite: data.is_favorite
+      isFavorite: isFavoriteBool
     });
 
   } catch (error) {

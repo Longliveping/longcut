@@ -119,3 +119,77 @@ export async function toggleVideoFavorite(userId: string, videoAnalysisId: strin
     .returning()
   return result[0] || null
 }
+
+export async function setVideoFavorite(
+  userId: string,
+  videoAnalysisId: string,
+  isFavorite: boolean
+) {
+  const existing = await db.select()
+    .from(userVideos)
+    .where(and(
+      eq(userVideos.userId, userId),
+      eq(userVideos.videoAnalysisId, videoAnalysisId)
+    ))
+
+  const isFavoriteInt = isFavorite ? 1 : 0
+
+  if (existing[0]) {
+    const result = await db.update(userVideos)
+      .set({ isFavorite: isFavoriteInt })
+      .where(and(
+        eq(userVideos.userId, userId),
+        eq(userVideos.videoAnalysisId, videoAnalysisId)
+      ))
+      .returning()
+    return result[0] || null
+  } else {
+    const now = Math.floor(Date.now() / 1000)
+    const link = {
+      id: crypto.randomUUID(),
+      userId,
+      videoAnalysisId,
+      isFavorite: isFavoriteInt,
+      createdAt: now,
+    }
+    const result = await db.insert(userVideos)
+      .values(link)
+      .returning()
+    return result[0] || null
+  }
+}
+
+function transformVideoAnalysis(dbResult: any): VideoAnalysis | null {
+  if (!dbResult) return null
+  
+  return {
+    id: dbResult.id,
+    youtubeId: dbResult.youtubeId,
+    userId: dbResult.userId,
+    title: dbResult.title,
+    author: dbResult.author,
+    thumbnailUrl: dbResult.thumbnailUrl,
+    duration: dbResult.duration,
+    transcript: typeof dbResult.transcript === 'string' 
+      ? JSON.parse(dbResult.transcript || '[]') 
+      : (dbResult.transcript || []),
+    topics: typeof dbResult.topics === 'string' 
+      ? JSON.parse(dbResult.topics || '[]') 
+      : (dbResult.topics || []),
+    summary: typeof dbResult.summary === 'string' 
+      ? JSON.parse(dbResult.summary) 
+      : dbResult.summary,
+    suggestedQuestions: typeof dbResult.suggestedQuestions === 'string' 
+      ? JSON.parse(dbResult.suggestedQuestions || '[]') 
+      : (dbResult.suggestedQuestions || []),
+    createdAt: dbResult.createdAt,
+    updatedAt: dbResult.updatedAt,
+  }
+}
+
+export async function getVideoAnalysisByYoutubeId(youtubeId: string): Promise<VideoAnalysis | null> {
+  const result = await db.select()
+    .from(videoAnalyses)
+    .where(eq(videoAnalyses.youtubeId, youtubeId))
+  return transformVideoAnalysis(result[0])
+}

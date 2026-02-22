@@ -1,5 +1,4 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
-import { sql } from 'drizzle-orm'
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
@@ -45,7 +44,7 @@ export const userVideos = sqliteTable('user_videos', {
 
 export const notes = sqliteTable('notes', {
   id: text('id').primaryKey(),
-  userId: text('userId').notNull().references(() => users.id),
+  userId: text('user_id').notNull().references(() => users.id),
   videoId: text('video_id').notNull().references(() => videoAnalyses.id),
   source: text('source').notNull(), // 'chat' | 'takeaways' | 'transcript' | 'custom'
   sourceId: text('source_id'),

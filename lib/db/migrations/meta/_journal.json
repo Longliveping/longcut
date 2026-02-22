@@ -15,6 +15,13 @@
       "when": 1771742662323,
       "tag": "0001_illegal_celestials",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1771742800000,
+      "tag": "0002_helpful_smiles",
+      "breakpoints": true
     }
   ]
 }

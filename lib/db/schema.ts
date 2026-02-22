@@ -3,8 +3,10 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
-  passwordHash: text('password_hash').notNull(),
+  emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
   name: text('name'),
+  image: text('image'),
+  passwordHash: text('password_hash').notNull(),
   createdAt: integer('created_at').notNull(),
   updatedAt: integer('updated_at').notNull(),
 })
@@ -16,6 +18,8 @@ export const sessions = sqliteTable('sessions', {
   token: text('token').notNull().unique(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
 })
 
 export const videoAnalyses = sqliteTable('video_analyses', {

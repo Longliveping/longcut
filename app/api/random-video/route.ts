@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { videoAnalyses } from "@/lib/db/schema";
+import { sql, count, eq } from "drizzle-orm";
 import { withSecurity, SECURITY_PRESETS } from "@/lib/security-middleware";
 
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-
-interface RandomVideoRow {
-  youtube_id: string;
+interface VideoAnalysisRow {
+  youtubeId: string;
   title: string | null;
   author: string | null;
   duration: number | null;
-  thumbnail_url: string | null;
-  slug: string | null;
+  thumbnailUrl: string | null;
   language: string | null;
 }
 
@@ -19,32 +18,32 @@ const MAX_RANDOM_ATTEMPTS = 6;
 const FALLBACK_BATCH_SIZE = 40;
 
 async function fetchVideoBatch(
-  supabase: SupabaseServerClient,
   start: number,
   end: number
-): Promise<RandomVideoRow[]> {
-  // Select only needed columns - avoid fetching large transcript field (~100KB savings per row)
-  const { data, error } = await supabase
-    .from("video_analyses")
-    .select("youtube_id,title,author,duration,thumbnail_url,slug,language")
-    .not("topics", "is", null)
-    .order("created_at", { ascending: false })
-    .range(start, end);
+): Promise<VideoAnalysisRow[]> {
+  // Select only needed columns - avoid fetching large transcript field
+  const { data } = await db
+    .select({
+      youtubeId: videoAnalyses.youtubeId,
+      title: videoAnalyses.title,
+      author: videoAnalyses.author,
+      duration: videoAnalyses.duration,
+      thumbnailUrl: videoAnalyses.thumbnailUrl,
+      language: videoAnalyses.language,
+    })
+    .from(videoAnalyses)
+    .where(sql`(${videoAnalyses.topics} IS NOT NULL)`)
+    .orderBy(sql`${videoAnalyses.createdAt} DESC`)
+    .limit(end - start + 1)
+    .offset(start);
 
-  if (error) {
-    console.error("Failed to fetch video batch for feeling lucky:", error);
-    throw error;
-  }
-
-  return Array.isArray(data) ? (data as RandomVideoRow[]) : [];
+  return data || [];
 }
 
-function selectEnglishVideo(batch: RandomVideoRow[]): RandomVideoRow | null {
-  // Use language column instead of fetching entire transcript
-  // This reduces data transfer by ~100KB per row
+function selectEnglishVideo(batch: VideoAnalysisRow[]): VideoAnalysisRow | null {
   return batch.find((row) => {
     if (!row.language) {
-      // If language is not set, assume English (older records before language tracking)
+      // If language is not set, assume English (older records)
       return true;
     }
     return row.language === 'en' || row.language.startsWith('en-');
@@ -52,9 +51,8 @@ function selectEnglishVideo(batch: RandomVideoRow[]): RandomVideoRow | null {
 }
 
 async function getRandomEnglishVideo(
-  supabase: SupabaseServerClient,
   totalCount: number
-): Promise<RandomVideoRow | null> {
+): Promise<VideoAnalysisRow | null> {
   if (totalCount <= 0) {
     return null;
   }
@@ -66,7 +64,7 @@ async function getRandomEnglishVideo(
     const startIndex = randomIndex;
     const endIndex = Math.min(lastIndex, randomIndex + RANDOM_BATCH_SIZE - 1);
 
-    const batch = await fetchVideoBatch(supabase, startIndex, endIndex);
+    const batch = await fetchVideoBatch(startIndex, endIndex);
     const englishCandidate = selectEnglishVideo(batch);
 
     if (englishCandidate) {
@@ -75,35 +73,26 @@ async function getRandomEnglishVideo(
   }
 
   const fallbackEnd = Math.min(lastIndex, FALLBACK_BATCH_SIZE - 1);
-  const fallbackBatch = await fetchVideoBatch(supabase, 0, fallbackEnd);
+  const fallbackBatch = await fetchVideoBatch(0, fallbackEnd);
   return selectEnglishVideo(fallbackBatch);
 }
 
 async function handler() {
   try {
-    const supabase = await createClient();
+    // Get total count of videos with topics
+    const [{ value: totalCount }] = await db
+      .select({ value: count() })
+      .from(videoAnalyses)
+      .where(sql`(${videoAnalyses.topics} IS NOT NULL)`);
 
-    const { count, error: countError } = await supabase
-      .from("video_analyses")
-      .select("id", { count: "exact", head: true })
-      .not("topics", "is", null);
-
-    if (countError) {
-      console.error("Failed to count video analyses for feeling lucky:", countError);
-      return NextResponse.json(
-        { error: "Unable to load a sample video right now." },
-        { status: 500 }
-      );
-    }
-
-    if (!count || count <= 0) {
+    if (!totalCount || totalCount <= 0) {
       return NextResponse.json(
         { error: "No analyzed videos are available yet." },
         { status: 404 }
       );
     }
 
-    const randomVideo = await getRandomEnglishVideo(supabase, count);
+    const randomVideo = await getRandomEnglishVideo(totalCount);
 
     if (!randomVideo) {
       console.warn("No English video found for feeling lucky request.");
@@ -114,13 +103,12 @@ async function handler() {
     }
 
     return NextResponse.json({
-      youtubeId: randomVideo.youtube_id,
+      youtubeId: randomVideo.youtubeId,
       title: randomVideo.title,
       author: randomVideo.author,
       duration: randomVideo.duration,
-      thumbnail: randomVideo.thumbnail_url,
-      slug: randomVideo.slug,
-      url: `https://www.youtube.com/watch?v=${randomVideo.youtube_id}`,
+      thumbnail: randomVideo.thumbnailUrl,
+      url: `https://www.youtube.com/watch?v=${randomVideo.youtubeId}`,
     });
   } catch (error) {
     console.error("Unexpected error while resolving feeling lucky request:", error);

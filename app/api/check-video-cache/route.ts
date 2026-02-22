@@ -1,27 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getVideoByYoutubeId } from '@/lib/api/videos'
+import { extractVideoId } from '@/lib/utils'
 
-export async function GET(req: NextRequest) {
-  const youtubeId = req.nextUrl.searchParams.get('youtubeId')
-
-  if (!youtubeId) {
-    return NextResponse.json({ error: 'Missing youtubeId' }, { status: 400 })
+// Safe JSON parsing helper
+function safeJsonParse<T>(str: string | null): T | null {
+  if (!str) return null
+  try {
+    return JSON.parse(str) as T
+  } catch {
+    return null
   }
+}
 
-  const cached = await getVideoByYoutubeId(youtubeId)
+export async function POST(req: NextRequest) {
+  try {
+    const { url } = await req.json()
+    const youtubeId = extractVideoId(url)
+    
+    if (!youtubeId) {
+      return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 })
+    }
 
-  if (!cached) {
-    return NextResponse.json({ cached: false })
+    const cached = await getVideoByYoutubeId(youtubeId)
+
+    if (!cached) {
+      return NextResponse.json({ cached: false, videoId: youtubeId })
+    }
+
+    // Reconstruct original response structure for backward compatibility
+    return NextResponse.json({
+      cached: true,
+      videoId: cached.youtubeId,
+      transcript: safeJsonParse(cached.transcript),
+      topics: safeJsonParse(cached.topics),
+      videoInfo: {
+        title: cached.title,
+        author: cached.author,
+        duration: cached.duration,
+        thumbnail: cached.thumbnailUrl,
+      },
+      summary: safeJsonParse(cached.summary),
+      suggestedQuestions: safeJsonParse(cached.suggestedQuestions),
+      cacheDate: new Date(cached.createdAt * 1000).toISOString(),
+      ownedByCurrentUser: false, // TODO: check session ownership
+    })
+  } catch (error) {
+    console.error('Check video cache error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
-
-  // Parse JSON fields
-  const analysis = {
-    ...cached,
-    transcript: cached.transcript ? JSON.parse(cached.transcript) : null,
-    topics: cached.topics ? JSON.parse(cached.topics) : null,
-    summary: cached.summary ? JSON.parse(cached.summary) : null,
-    suggestedQuestions: cached.suggestedQuestions ? JSON.parse(cached.suggestedQuestions) : null,
-  }
-
-  return NextResponse.json({ cached: true, analysis })
 }

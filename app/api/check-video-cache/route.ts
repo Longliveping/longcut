@@ -1,134 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { extractVideoId } from '@/lib/utils';
-import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
-import { ensureMergedFormat } from '@/lib/transcript-format-detector';
-import { TranscriptSegment } from '@/lib/types';
+import { NextRequest, NextResponse } from 'next/server'
+import { getVideoByYoutubeId } from '@/lib/api/videos'
 
-async function handler(req: NextRequest) {
-  try {
-    const { url } = await req.json();
+export async function GET(req: NextRequest) {
+  const youtubeId = req.nextUrl.searchParams.get('youtubeId')
 
-    if (!url) {
-      return NextResponse.json(
-        { error: 'URL is required' },
-        { status: 400 }
-      );
-    }
-
-    // Extract video ID from URL
-    const videoId = extractVideoId(url);
-    if (!videoId) {
-      return NextResponse.json(
-        { error: 'Invalid YouTube URL' },
-        { status: 400 }
-      );
-    }
-
-    const supabase = await createClient();
-
-    // Get current user if logged in (optional)
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // Check for cached video
-    const { data: cachedVideo } = await supabase
-      .from('video_analyses')
-      .select('*')
-      .eq('youtube_id', videoId)
-      .single();
-
-    if (cachedVideo && cachedVideo.topics) {
-      let ownedByCurrentUser = false;
-
-      if (user?.id) {
-        // Check if user is the original creator via created_by column
-        if (cachedVideo.created_by && cachedVideo.created_by === user.id) {
-          ownedByCurrentUser = true;
-        } else {
-          const ownershipQuery = supabase
-            .from('video_generations')
-            .select('id')
-            .eq('user_id', user.id)
-            .limit(1);
-
-          const orConditions: string[] = [];
-
-          if (cachedVideo.id) {
-            orConditions.push(`video_id.eq.${cachedVideo.id}`);
-          }
-          if (videoId) {
-            orConditions.push(`youtube_id.eq.${videoId}`);
-          }
-
-          if (orConditions.length > 0) {
-            ownershipQuery.or(orConditions.join(','));
-          }
-
-          const { data: generationLink, error: generationError } = await ownershipQuery.maybeSingle();
-
-          if (generationError) {
-            console.error('Failed to check video generations ownership:', generationError);
-          }
-
-          if (generationLink) {
-            ownedByCurrentUser = true;
-          }
-        }
-      }
-      // If user is logged in, track their access to this video
-      if (user) {
-        await supabase
-          .from('user_videos')
-          .upsert({
-            user_id: user.id,
-            video_id: cachedVideo.id,
-            accessed_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,video_id'
-          });
-      }
-
-      // Ensure transcript is in merged format (backward compatibility for old cached videos)
-      const originalTranscript = cachedVideo.transcript as TranscriptSegment[];
-      const migratedTranscript = ensureMergedFormat(originalTranscript, {
-        enableLogging: true,
-        context: `YouTube ID: ${videoId}`
-      });
-
-      // Return all cached data including transcript and video info
-      return NextResponse.json({
-        cached: true,
-        videoId: videoId,
-        topics: cachedVideo.topics,
-        transcript: migratedTranscript,
-        videoInfo: {
-          title: cachedVideo.title,
-          author: cachedVideo.author,
-          duration: cachedVideo.duration,
-          thumbnail: cachedVideo.thumbnail_url,
-          language: cachedVideo.language ?? undefined,
-          availableLanguages: cachedVideo.available_languages ?? undefined
-        },
-        summary: cachedVideo.summary,
-        suggestedQuestions: cachedVideo.suggested_questions,
-        cacheDate: cachedVideo.created_at,
-        ownedByCurrentUser
-      });
-    }
-
-    // Video not cached
-    return NextResponse.json({
-      cached: false,
-      videoId: videoId
-    });
-
-  } catch (error) {
-    console.error('Error checking video cache:', error);
-    return NextResponse.json(
-      { error: 'Failed to check video cache' },
-      { status: 500 }
-    );
+  if (!youtubeId) {
+    return NextResponse.json({ error: 'Missing youtubeId' }, { status: 400 })
   }
-}
 
-export const POST = withSecurity(handler, SECURITY_PRESETS.PUBLIC);
+  const cached = await getVideoByYoutubeId(youtubeId)
+
+  if (!cached) {
+    return NextResponse.json({ cached: false })
+  }
+
+  // Parse JSON fields
+  const analysis = {
+    ...cached,
+    transcript: cached.transcript ? JSON.parse(cached.transcript) : null,
+    topics: cached.topics ? JSON.parse(cached.topics) : null,
+    summary: cached.summary ? JSON.parse(cached.summary) : null,
+    suggestedQuestions: cached.suggestedQuestions ? JSON.parse(cached.suggestedQuestions) : null,
+  }
+
+  return NextResponse.json({ cached: true, analysis })
+}

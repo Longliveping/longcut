@@ -111,14 +111,14 @@ export async function createTestUser(overrides: Partial<TestUser> = {}): Promise
     id: userId,
     email: overrides.email || `test-${userId.slice(0, 8)}@example.com`,
     full_name: overrides.full_name || 'Test User',
-    avatar_url: overrides.avatar_url || null,
+    avatar_url: overrides.avatar_url || undefined,
     subscription_tier: overrides.subscription_tier || 'free',
-    subscription_status: overrides.subscription_status || null,
+    subscription_status: overrides.subscription_status || undefined,
     topup_credits: overrides.topup_credits ?? 0,
     topic_generation_mode: overrides.topic_generation_mode || 'smart',
   };
 
-  const { error } = await client
+  const { error } = await client!
     .from('profiles')
     .insert(testUser as any);
 
@@ -152,7 +152,7 @@ export async function createTestVideoAnalysis(
     model_used: data.model_used || 'gemini-2.5-flash',
   };
 
-  const { error } = await client
+  const { error } = await client!
     .from('video_analyses')
     .insert(videoAnalysis as any);
 
@@ -182,7 +182,7 @@ export async function createTestUserNote(
     metadata: data.metadata || null,
   };
 
-  const { error } = await client
+  const { error } = await client!
     .from('user_notes')
     .insert(userNote as any);
 
@@ -211,7 +211,7 @@ export async function createTestUserVideo(
     accessed_at: data.accessed_at || new Date().toISOString(),
   };
 
-  const { error } = await client
+  const { error } = await client!
     .from('user_videos')
     .insert(userVideo as any);
 
@@ -233,8 +233,8 @@ export async function createTestScenario(options: {
 }) {
   const user = await createTestUser(options.user || {});
   const video = await createTestVideoAnalysis({
-    youtube_id: options.video.youtube_id,
-    title: options.video.title,
+    youtube_id: options.video?.youtube_id || 'test-youtube-id',
+    title: options.video?.title || 'Test Video',
     ...options.video,
   });
 
@@ -267,7 +267,7 @@ export async function createTestScenario(options: {
 export async function deleteTestUser(userId: string): Promise<void> {
   const client = getTestDbClient();
 
-  const { error } = await client
+  const { error } = await client!
     .from('profiles')
     .delete()
     .eq('id', userId);
@@ -283,7 +283,7 @@ export async function deleteTestUser(userId: string): Promise<void> {
 export async function deleteTestVideoAnalysis(videoId: string): Promise<void> {
   const client = getTestDbClient();
 
-  const { error } = await client
+  const { error } = await client!
     .from('video_analyses')
     .delete()
     .eq('id', videoId);
@@ -299,7 +299,7 @@ export async function deleteTestVideoAnalysis(videoId: string): Promise<void> {
 export async function deleteTestUserNote(noteId: string): Promise<void> {
   const client = getTestDbClient();
 
-  const { error } = await client
+  const { error } = await client!
     .from('user_notes')
     .delete()
     .eq('id', noteId);
@@ -315,7 +315,7 @@ export async function deleteTestUserNote(noteId: string): Promise<void> {
 export async function deleteTestUserVideo(userVideoId: string): Promise<void> {
   const client = getTestDbClient();
 
-  const { error } = await client
+  const { error } = await client!
     .from('user_videos')
     .delete()
     .eq('id', userVideoId);
@@ -336,8 +336,8 @@ export async function cleanupTestData(userIds: string[] = []): Promise<void> {
   // Delete user relationships first (due to foreign key constraints)
   for (const userId of userIds) {
     try {
-      await client.from('user_notes').delete().eq('user_id', userId);
-      await client.from('user_videos').delete().eq('user_id', userId);
+      await client!.from('user_notes').delete().eq('user_id', userId);
+      await client!.from('user_videos').delete().eq('user_id', userId);
     } catch (e) {
       errors.push(`Failed to delete user relationships for ${userId}: ${e}`);
     }
@@ -346,7 +346,7 @@ export async function cleanupTestData(userIds: string[] = []): Promise<void> {
   // Delete users
   for (const userId of userIds) {
     try {
-      await client.from('profiles').delete().eq('id', userId);
+      await client!.from('profiles').delete().eq('id', userId);
     } catch (e) {
       errors.push(`Failed to delete user ${userId}: ${e}`);
     }
@@ -367,7 +367,7 @@ export async function cleanupTestUsersByEmailPattern(
   const client = getTestDbClient();
 
   // First, get all matching user IDs
-  const { data: users, error } = await client
+  const { data: users, error } = await client!
     .from('profiles')
     .select('id')
     .like('email', pattern);
@@ -394,7 +394,7 @@ export async function cleanupTestUsersByEmailPattern(
 export async function getTestUser(userId: string): Promise<TestUser | null> {
   const client = getTestDbClient();
 
-  const { data, error } = await client
+  const { data, error } = await client!
     .from('profiles')
     .select('*')
     .eq('id', userId)
@@ -418,7 +418,7 @@ export async function getTestVideoAnalysis(
 ): Promise<TestVideoAnalysis & { id: string } | null> {
   const client = getTestDbClient();
 
-  const { data, error } = await client
+  const { data, error } = await client!
     .from('video_analyses')
     .select('*')
     .eq('id', videoId)
@@ -442,7 +442,7 @@ export async function getTestVideoAnalysisByYoutubeId(
 ): Promise<TestVideoAnalysis & { id: string } | null> {
   const client = getTestDbClient();
 
-  const { data, error } = await client
+  const { data, error } = await client!
     .from('video_analyses')
     .select('*')
     .eq('youtube_id', youtubeId)
@@ -464,7 +464,7 @@ export async function getTestVideoAnalysisByYoutubeId(
 export async function getTestUserNotes(userId: string): Promise<TestUserNote[]> {
   const client = getTestDbClient();
 
-  const { data, error } = await client
+  const { data, error } = await client!
     .from('user_notes')
     .select('*')
     .eq('user_id', userId);
@@ -482,7 +482,7 @@ export async function getTestUserNotes(userId: string): Promise<TestUserNote[]> 
 export async function getTestUserVideos(userId: string): Promise<TestUserVideo[]> {
   const client = getTestDbClient();
 
-  const { data, error } = await client
+  const { data, error } = await client!
     .from('user_videos')
     .select('*')
     .eq('user_id', userId);
@@ -500,7 +500,7 @@ export async function getTestUserVideos(userId: string): Promise<TestUserVideo[]
 export async function countTableRecords(tableName: string): Promise<number> {
   const client = getTestDbClient();
 
-  const { count, error } = await client
+  const { count, error } = await client!
     .from(tableName)
     .select('*', { count: 'exact', head: true });
 
@@ -521,7 +521,7 @@ export async function countTableRecords(tableName: string): Promise<number> {
 export async function isDatabaseAccessible(): Promise<boolean> {
   try {
     const client = getTestDbClient();
-    const { error } = await client.from('profiles').select('id').limit(1);
+    const { error } = await client!.from('profiles').select('id').limit(1);
     return !error;
   } catch {
     return false;
@@ -563,19 +563,19 @@ export async function withTestTransaction<T>(
   
   try {
     // Begin transaction
-    await client.rpc('begin_transaction');
+    await client!.rpc('begin_transaction');
     
     // Execute callback
     const result = await callback();
     
     // Rollback transaction (clean up test data)
-    await client.rpc('rollback_transaction');
+    await client!.rpc('rollback_transaction');
     
     return result;
   } catch (error) {
     // Ensure rollback on error
     try {
-      await client.rpc('rollback_transaction');
+      await client!.rpc('rollback_transaction');
     } catch {
       // Ignore rollback errors
     }

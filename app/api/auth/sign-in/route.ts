@@ -21,10 +21,10 @@ export async function POST(req: Request) {
       headers: await headers(),
     })
     
-    // Check for error in result
-    if (result.error) {
+    // Check if user exists (successful authentication)
+    if (!result.user) {
       return Response.json(
-        { error: result.error.message || 'Authentication failed' },
+        { error: 'Authentication failed' },
         { status: 401 }
       )
     }

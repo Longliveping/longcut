@@ -18,10 +18,11 @@ import {
 } from '@/lib/subscription-manager';
 import { NO_CREDITS_USED_MESSAGE } from '@/lib/no-credits-message';
 import { ensureMergedFormat } from '@/lib/transcript-format-detector';
+import type { Topic } from '@/lib/types';
 import { TranscriptSegment } from '@/lib/types';
 import { getGuestAccessState, recordGuestUsage, setGuestCookies } from '@/lib/guest-usage';
 import {
-  getVideoByYoutubeId,
+  getVideoAnalysisByYoutubeId,
   createVideoAnalysis,
   updateVideoAnalysis,
   linkVideoToUser,
@@ -114,13 +115,13 @@ async function saveVideoAnalysisToSQLite(params: {
 }): Promise<{ success: boolean; videoId: string | null; error: string | null }> {
   try {
     // Check if video already exists
-    const existing = await getVideoByYoutubeId(params.youtubeId);
+    const existing = await getVideoAnalysisByYoutubeId(params.youtubeId);
 
     if (existing) {
       // Update existing video
       const updated = await updateVideoAnalysis(existing.id, {
         transcript: params.transcript as TranscriptSegment[],
-        topics: params.topics,
+        topics: params.topics as Topic[],
         summary: params.summary,
         suggestedQuestions: params.suggestedQuestions as string[],
       });
@@ -135,13 +136,13 @@ async function saveVideoAnalysisToSQLite(params: {
     // Create new video analysis
     const newVideo = await createVideoAnalysis({
       youtubeId: params.youtubeId,
-      userId: params.userId,
+      userId: params.userId || undefined,
       title: params.title,
       author: params.author || undefined,
       thumbnailUrl: params.thumbnailUrl || undefined,
       duration: params.duration || undefined,
       transcript: params.transcript,
-      topics: params.topics,
+      topics: params.topics as Topic[],
       summary: params.summary,
       suggestedQuestions: params.suggestedQuestions as string[],
     });
@@ -203,10 +204,10 @@ async function handler(req: NextRequest) {
     // Check SQLite cache first
     let cachedVideo: VideoAnalysis | null = null;
     if (!forceRegenerate) {
-      cachedVideo = await getVideoByYoutubeId(videoId);
+      cachedVideo = await getVideoAnalysisByYoutubeId(videoId);
     }
 
-    const isCachedAnalysis = Boolean(cachedVideo?.topics && safeJsonParse(cachedVideo.topics));
+    const isCachedAnalysis = Boolean(cachedVideo?.topics && cachedVideo.topics.length > 0);
 
     let generationDecision: GenerationDecision | null = null;
     let alreadyCountedThisPeriod = false;
@@ -373,11 +374,11 @@ async function handler(req: NextRequest) {
     }
 
     // Serve cached analysis from SQLite but still count credits when required
-    if (!forceRegenerate && cachedVideo && safeJsonParse(cachedVideo.topics)) {
-      const parsedTopics = safeJsonParse(cachedVideo.topics);
-      const parsedTranscript = safeJsonParse<TranscriptSegment[]>(cachedVideo.transcript);
-      const parsedSummary = safeJsonParse(cachedVideo.summary);
-      const parsedSuggestedQuestions = safeJsonParse<string[]>(cachedVideo.suggestedQuestions);
+    if (!forceRegenerate && cachedVideo && cachedVideo.topics.length > 0) {
+      const parsedTopics = cachedVideo.topics;
+      const parsedTranscript = cachedVideo.transcript;
+      const parsedSummary = cachedVideo.summary;
+      const parsedSuggestedQuestions = cachedVideo.suggestedQuestions;
 
       // If user is logged in, track their access to this video
       if (user) {

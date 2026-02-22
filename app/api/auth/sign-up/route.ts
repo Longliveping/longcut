@@ -6,9 +6,9 @@ export async function POST(req: Request) {
     const body = await req.json()
     
     // Basic validation
-    if (!body.email || !body.password) {
+    if (!body.email || !body.password || !body.name) {
       return Response.json(
-        { error: 'Email and password are required' },
+        { error: 'Email, password, and name are required' },
         { status: 400 }
       )
     }
@@ -22,15 +22,15 @@ export async function POST(req: Request) {
       headers: await headers(),
     })
     
-    // Check for error in result
-    if (result.error) {
+    // Check if user was created successfully
+    if (!result.user) {
       return Response.json(
-        { error: result.error.message || 'Registration failed' },
+        { error: 'Registration failed' },
         { status: 400 }
       )
     }
     
-    return Response.json(result, { status: 201 })
+    return Response.json(result)
   } catch (error) {
     console.error('Sign-up error:', error)
     return Response.json(

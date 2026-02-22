@@ -16,7 +16,7 @@ export class AuthHelper {
     const client = getTestDbClient()
 
     // Create user with admin API
-    const { data, error } = await client.auth.admin.createUser({
+    const { data, error } = await client!.auth.admin.createUser({
       email,
       password,
       email_confirm: true
@@ -25,7 +25,7 @@ export class AuthHelper {
     if (error) throw error
 
     // Generate access token using signInWithPassword
-    const { data: signInData, error: signInError } = await client.auth.signInWithPassword({
+    const { data: signInData, error: signInError } = await client!.auth.signInWithPassword({
       email,
       password
     })
@@ -52,6 +52,6 @@ export class AuthHelper {
 
   static async cleanupTestUser(userId: string) {
     const client = getTestDbClient()
-    await client.auth.admin.deleteUser(userId)
+    await client!.auth.admin.deleteUser(userId)
   }
 }

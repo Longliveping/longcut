@@ -1,4 +1,7 @@
-import { SupabaseClient } from '@supabase/supabase-js';
+import { db } from './db';
+import { videoAnalyses, userVideos } from './db/schema';
+import { eq } from 'drizzle-orm';
+import { getVideoByYoutubeId, linkVideoToUser } from './api/videos';
 
 interface VideoAnalysisParams {
   youtubeId: string;
@@ -36,7 +39,6 @@ interface RetryOptions {
  * retries with exponential backoff to handle such cases.
  */
 export async function saveVideoAnalysisWithRetry(
-  supabase: SupabaseClient,
   params: VideoAnalysisParams,
   options?: RetryOptions
 ): Promise<SaveResult> {
@@ -44,29 +46,28 @@ export async function saveVideoAnalysisWithRetry(
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      const { data, error } = await supabase.rpc('insert_video_analysis_server', {
-        p_youtube_id: params.youtubeId,
-        p_title: params.title,
-        p_author: params.author,
-        p_duration: params.duration,
-        p_thumbnail_url: params.thumbnailUrl,
-        p_transcript: params.transcript,
-        p_topics: params.topics,
-        p_summary: params.summary ?? null,
-        p_suggested_questions: params.suggestedQuestions ?? null,
-        p_model_used: params.modelUsed ?? null,
-        p_user_id: params.userId ?? null,
-        p_language: params.language ?? null,
-        p_available_languages: params.availableLanguages ?? null
-      });
+      const id = crypto.randomUUID();
+      const now = Math.floor(Date.now() / 1000);
 
-      if (error) {
-        throw error;
-      }
+      await db.insert(videoAnalyses).values({
+        id,
+        youtubeId: params.youtubeId,
+        userId: params.userId ?? null,
+        title: params.title,
+        author: params.author,
+        thumbnailUrl: params.thumbnailUrl,
+        duration: params.duration,
+        transcript: JSON.stringify(params.transcript ?? []),
+        topics: JSON.stringify(params.topics ?? []),
+        summary: JSON.stringify(params.summary ?? null),
+        suggestedQuestions: JSON.stringify(params.suggestedQuestions ?? null),
+        createdAt: now,
+        updatedAt: now,
+      });
 
       return {
         success: true,
-        videoId: data as string,
+        videoId: id,
         error: null,
         retriedCount: attempt
       };
@@ -76,9 +77,9 @@ export async function saveVideoAnalysisWithRetry(
       // Check if this is a retryable error (FK constraint, profile not ready)
       const isRetryableError =
         errorMessage.includes('foreign key') ||
-        errorMessage.includes('profiles') ||
-        errorMessage.includes('violates foreign key constraint') ||
-        errorMessage.includes('user_videos_user_id_fkey');
+        errorMessage.includes('FOREIGN KEY constraint') ||
+        errorMessage.includes('user_videos') ||
+        errorMessage.includes('users');
 
       if (isRetryableError && attempt < maxRetries - 1) {
         console.warn(
@@ -110,50 +111,19 @@ export async function saveVideoAnalysisWithRetry(
  * This is a fallback mechanism for when the initial save fails but the video exists.
  */
 export async function ensureUserVideoLink(
-  supabase: SupabaseClient,
   userId: string,
   youtubeId: string
 ): Promise<{ linked: boolean; videoId: string | null; error: string | null }> {
   try {
     // First, check if the video exists
-    const { data: video, error: videoError } = await supabase
-      .from('video_analyses')
-      .select('id')
-      .eq('youtube_id', youtubeId)
-      .single();
+    const video = await getVideoByYoutubeId(youtubeId);
 
-    if (videoError || !video) {
+    if (!video) {
       return { linked: false, videoId: null, error: 'Video not found' };
     }
 
-    // Check if link already exists
-    const { data: existingLink } = await supabase
-      .from('user_videos')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('video_id', video.id)
-      .single();
-
-    if (existingLink) {
-      return { linked: true, videoId: video.id, error: null };
-    }
-
-    // Create the missing link
-    const { error: insertError } = await supabase
-      .from('user_videos')
-      .upsert(
-        {
-          user_id: userId,
-          video_id: video.id,
-          accessed_at: new Date().toISOString()
-        },
-        { onConflict: 'user_id,video_id' }
-      );
-
-    if (insertError) {
-      console.error('[ensureUserVideoLink] Failed to create link:', insertError);
-      return { linked: false, videoId: video.id, error: insertError.message };
-    }
+    // Use linkVideoToUser which handles onConflictDoNothing
+    await linkVideoToUser(userId, video.id);
 
     return { linked: true, videoId: video.id, error: null };
   } catch (err) {

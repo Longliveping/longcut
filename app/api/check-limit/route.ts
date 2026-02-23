@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
 import { hasUnlimitedVideoAllowance } from '@/lib/access-control';
 import {
@@ -7,6 +6,7 @@ import {
   TIER_LIMITS,
 } from '@/lib/subscription-manager';
 import { getGuestAccessState, setGuestCookies } from '@/lib/guest-usage';
+import { requireSession } from '@/lib/auth/server';
 
 /**
  * GET /api/check-limit
@@ -28,16 +28,12 @@ import { getGuestAccessState, setGuestCookies } from '@/lib/guest-usage';
  */
 async function handler(_request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check if user is authenticated
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const session = await requireSession();
+    const user = session.user;
 
     // Handle anonymous guests with a one-time allowance
     if (!user) {
-      const guestState = await getGuestAccessState({ supabase });
+      const guestState = await getGuestAccessState();
       const canGenerate = !guestState.used;
 
       const response = NextResponse.json({
@@ -95,60 +91,33 @@ async function handler(_request: NextRequest) {
     }
 
     // Handle authenticated users with subscription system
-    if (user) {
-      const decision = await canGenerateVideo(user.id, undefined, {
-        client: supabase,
-        skipCacheCheck: true,
-      });
+    const decision = await canGenerateVideo(user.id, undefined, {
+      skipCacheCheck: true,
+    });
 
-      const stats = decision.stats;
-      const tier = decision.subscription?.tier ?? 'free';
-      const resetAt =
-        stats?.resetAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      const fallbackBaseLimit = tier === 'pro' ? TIER_LIMITS.pro : TIER_LIMITS.free;
+    const stats = decision.stats;
+    const tier = decision.subscription?.tier ?? 'free';
+    const resetAt = stats?.resetAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const fallbackBaseLimit = tier === 'pro' ? TIER_LIMITS.pro : TIER_LIMITS.free;
 
-      return NextResponse.json({
-        canGenerate: decision.allowed,
-        isAuthenticated: true,
-        unlimited: false,
-        tier,
-        status: decision.subscription?.status ?? null,
-        reason: decision.allowed ? null : decision.reason,
-        warning: decision.warning ?? null,
-        resetAt,
-        requiresTopup: decision.requiresTopupPurchase ?? false,
-        willConsumeTopup: decision.willConsumeTopup ?? false,
-        usage: {
-          counted: stats?.counted ?? 0,
-          cached: stats?.cached ?? 0,
-          baseLimit: stats?.baseLimit ?? fallbackBaseLimit,
-          baseRemaining: stats?.baseRemaining ?? 0,
-          topupRemaining: stats?.topupRemaining ?? 0,
-          totalRemaining: stats?.totalRemaining ?? 0,
-        },
-      });
-    }
-
-    // Anonymous users cannot generate analyses — force authentication
     return NextResponse.json({
-      canGenerate: false,
-      isAuthenticated: false,
-      tier: 'anonymous',
-      status: null,
-      reason: 'AUTH_REQUIRED',
-      warning: null,
+      canGenerate: decision.allowed,
+      isAuthenticated: true,
       unlimited: false,
-      requiresAuth: true,
-      resetAt: null,
-      requiresTopup: false,
-      willConsumeTopup: false,
+      tier,
+      status: decision.subscription?.status ?? null,
+      reason: decision.allowed ? null : decision.reason,
+      warning: decision.warning ?? null,
+      resetAt,
+      requiresTopup: decision.requiresTopupPurchase ?? false,
+      willConsumeTopup: decision.willConsumeTopup ?? false,
       usage: {
-        counted: null,
-        cached: null,
-        baseLimit: 0,
-        baseRemaining: 0,
-        topupRemaining: 0,
-        totalRemaining: 0,
+        counted: stats?.counted ?? 0,
+        cached: stats?.cached ?? 0,
+        baseLimit: stats?.baseLimit ?? fallbackBaseLimit,
+        baseRemaining: stats?.baseRemaining ?? 0,
+        topupRemaining: stats?.topupRemaining ?? 0,
+        totalRemaining: stats?.totalRemaining ?? 0,
       },
     });
   } catch (error) {

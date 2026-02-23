@@ -3,12 +3,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { openBillingPortal as openPortalAction, startCheckout } from '@/lib/stripe-actions'
 import { UsageIndicator } from '@/components/usage-indicator'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Card,
   CardContent,
@@ -20,19 +17,15 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Loader2, AlertCircle, CreditCard, Sparkles } from 'lucide-react'
+import { Loader2, AlertCircle, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
-import type { User } from '@supabase/supabase-js'
-import { csrfFetch, getCSRFToken } from '@/lib/csrf-client'
-import { cn } from '@/lib/utils'
+import { csrfFetch } from '@/lib/csrf-client'
 
-interface Profile {
+interface User {
   id: string
   email: string
-  full_name: string | null
-  avatar_url: string | null
-  created_at: string
-  updated_at: string
+  name?: string | null
+  image?: string | null
 }
 
 type SubscriptionTier = 'free' | 'pro' | 'enterprise'
@@ -113,7 +106,6 @@ function mapToSubscriptionSummary(payload: SubscriptionStatusResponse): Subscrip
 
 interface SettingsFormProps {
   user: User
-  profile: Profile | null
   videoCount: number
   subscription: SubscriptionSummary | null
 }
@@ -168,28 +160,15 @@ function formatStatus(subscription: SubscriptionSummary | null): string {
   }
 }
 
-export default function SettingsForm({ user, profile, videoCount, subscription }: SettingsFormProps) {
+export default function SettingsForm({ user, videoCount, subscription }: SettingsFormProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const supabase = createClient()
-
-  const [fullName, setFullName] = useState(profile?.full_name || '')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
 
   const [loading, setLoading] = useState(false)
   const [billingAction, setBillingAction] = useState<'subscription' | 'topup' | 'portal' | null>(null)
   const [pendingSubscription, setPendingSubscription] = useState<SubscriptionSummary | null>(null)
 
   const currentSubscription = pendingSubscription ?? subscription
-
-  // Pre-fetch CSRF token in background for faster checkout (PERFORMANCE OPTIMIZATION)
-  // This saves ~100-200ms on first Stripe action by caching the token before user clicks
-  useEffect(() => {
-    getCSRFToken().catch((error) => {
-      console.error('Failed to pre-fetch CSRF token:', error)
-    })
-  }, [])
 
   useEffect(() => {
     if (subscription?.tier === 'pro') {
@@ -363,68 +342,11 @@ export default function SettingsForm({ user, profile, videoCount, subscription }
     }
   }, [searchParams, subscription?.tier, router])
 
-  const hasProfileChanges = useMemo(() => {
-    return fullName !== (profile?.full_name || '')
-  }, [fullName, profile?.full_name])
-
   const planLabel = currentSubscription?.tier === 'pro' ? 'Pro Plan' : 'Free Plan'
   const planStatus = formatStatus(currentSubscription)
   const isCancellationScheduled = Boolean(currentSubscription?.cancelAtPeriodEnd)
   const isPastDue = Boolean(currentSubscription?.isPastDue)
   const StatusIcon = isCancellationScheduled ? AlertCircle : isPastDue ? AlertCircle : Sparkles
-
-  const handleUpdateProfile = async () => {
-    if (!hasProfileChanges) {
-      return
-    }
-
-    setLoading(true)
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        full_name: fullName,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id)
-
-    if (error) {
-      toast.error(error.message)
-    } else {
-      toast.success('Settings updated successfully!')
-      router.refresh()
-    }
-
-    setLoading(false)
-  }
-
-  const handleUpdatePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match')
-      return
-    }
-
-    if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters')
-      return
-    }
-
-    setLoading(true)
-
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword
-    })
-
-    if (error) {
-      toast.error(error.message)
-    } else {
-      toast.success('Password updated successfully!')
-      setNewPassword('')
-      setConfirmPassword('')
-    }
-
-    setLoading(false)
-  }
 
   const handleCheckout = async (priceType: 'subscription' | 'topup') => {
     try {
@@ -450,71 +372,61 @@ export default function SettingsForm({ user, profile, videoCount, subscription }
     }
   }
 
-  const subscriptionWarnings = useMemo(() => {
-    if (!currentSubscription) return []
-    const warnings: Array<{ title: string; message: string; variant?: 'default' | 'destructive' }> = []
-
-    if (currentSubscription.isPastDue) {
-      warnings.push({
-        title: 'Payment required',
-        message: 'Your payment method failed. Update billing details to restore full access.',
-        variant: 'destructive',
-      })
-    }
-
-    if (currentSubscription.willConsumeTopup) {
-      warnings.push({
-        title: 'Top-Up credits in use',
-        message: 'The next video generation will consume Top-Up credits.',
-      })
-    }
-
-    return warnings
-  }, [currentSubscription])
-
-  const statsRows = useMemo(() => {
-    const createdAt = new Date(profile?.created_at || user.created_at)
-    const stats = [
-      {
-        label: 'Account created',
-        value: createdAt.toLocaleDateString(),
-      },
-      {
-        label: 'Videos saved',
-        value: `${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`,
-      },
-    ]
-
-    return stats
-  }, [profile?.created_at, user.created_at, videoCount])
-
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xl">Subscription</CardTitle>
-          <CardDescription className="text-sm">
-            View your plan, usage, and manage billing preferences.
-          </CardDescription>
+      {/* Account Info Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Account</CardTitle>
+          <CardDescription>Your account information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">Email</p>
+            <p className="text-sm">{user.email}</p>
+          </div>
+          {user.name && (
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">Name</p>
+              <p className="text-sm">{user.name}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Subscription Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Subscription</CardTitle>
+          <CardDescription>Manage your subscription and billing</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Plan Details */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <StatusIcon className="h-4 w-4" />
+                <p className="font-semibold">{planLabel}</p>
+              </div>
+              <p className="text-sm text-muted-foreground">{planStatus}</p>
+            </div>
             <Badge variant={currentSubscription?.tier === 'pro' ? 'default' : 'secondary'}>
-              {planLabel}
+              {currentSubscription?.tier === 'pro' ? 'Pro' : 'Free'}
             </Badge>
-            <span
-              className={cn(
-                'text-sm flex items-center gap-1',
-                isPastDue ? 'text-amber-600 dark:text-amber-500' :
-                isCancellationScheduled ? 'text-foreground' : 'text-muted-foreground'
-              )}
-            >
-              <StatusIcon className="h-4 w-4" />
-              {planStatus}
-            </span>
           </div>
 
-          {currentSubscription ? (
+          {isPastDue && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Past Due</AlertTitle>
+              <AlertDescription>
+                Your subscription payment is past due. Please update your payment method to avoid service interruption.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Usage Indicator */}
+          {currentSubscription && (
             <UsageIndicator
               counted={currentSubscription.usage.counted}
               baseLimit={currentSubscription.usage.baseLimit}
@@ -523,202 +435,60 @@ export default function SettingsForm({ user, profile, videoCount, subscription }
               resetAt={currentSubscription.usage.resetAt}
               warning={currentSubscription.isPastDue ? 'PAST_DUE' : null}
             />
-          ) : (
-            <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-              Usage tracking will appear here once your account is fully set up.
-            </div>
           )}
 
-          {subscriptionWarnings.length > 0 && (
-            <div className="space-y-3">
-              {subscriptionWarnings.map((warning, index) => (
-                <Alert key={index} variant={warning.variant ?? 'default'}>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>{warning.title}</AlertTitle>
-                  <AlertDescription>{warning.message}</AlertDescription>
-                </Alert>
-              ))}
-            </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex flex-wrap gap-3">
-          {currentSubscription?.tier === 'pro' ? (
-            <>
-              <Button
-                onClick={openBillingPortal}
-                disabled={billingAction !== null}
-              >
-                {billingAction === 'portal' ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Opening portal...
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Manage billing
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleCheckout('topup')}
-                disabled={billingAction !== null || !currentSubscription?.canPurchaseTopup}
-              >
-                {billingAction === 'topup' ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Redirecting...
-                  </>
-                ) : (
-                  'Buy Top-Up (+20 credits)'
-                )}
-              </Button>
-            </>
-          ) : (
-            <>
+          <Separator />
+
+          {/* Billing Actions */}
+          <div className="space-y-3">
+            {currentSubscription?.tier === 'free' && (
               <Button
                 onClick={() => handleCheckout('subscription')}
-                disabled={billingAction !== null}
+                disabled={billingAction === 'subscription'}
+                className="w-full"
               >
-                {billingAction === 'subscription' ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Redirecting...
-                  </>
-                ) : (
-                  'Upgrade to Pro'
-                )}
+                {billingAction === 'subscription' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Upgrade to Pro
               </Button>
-              <Button asChild variant="outline">
-                <Link href="/pricing">View pricing</Link>
-              </Button>
-            </>
+            )}
+
+            {currentSubscription?.tier === 'pro' && (
+              <>
+                <Button
+                  onClick={() => handleCheckout('topup')}
+                  disabled={billingAction === 'topup'}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {billingAction === 'topup' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Purchase Top-Up Credits
+                </Button>
+                <Button
+                  onClick={openBillingPortal}
+                  disabled={billingAction === 'portal'}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {billingAction === 'portal' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Manage Billing
+                </Button>
+              </>
+            )}
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <p className="text-xs text-muted-foreground">
+            {videoCount} video{videoCount !== 1 ? 's' : ''} analyzed
+          </p>
+          {currentSubscription?.tier === 'pro' && (
+            <Link
+              href="/pricing"
+              className="text-xs text-muted-foreground hover:underline"
+            >
+              View pricing
+            </Link>
           )}
         </CardFooter>
-      </Card>
-
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl">Profile information</CardTitle>
-          <CardDescription className="text-sm">
-            Update your personal information and preferences.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={user.email}
-              disabled
-              className="bg-muted"
-            />
-            <p className="text-xs text-muted-foreground">Email cannot be changed</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full name</Label>
-            <Input
-              id="fullName"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Enter your full name"
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button 
-            onClick={handleUpdateProfile} 
-            disabled={loading || !hasProfileChanges}
-            size="default"
-            className="min-w-[140px]"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              'Save changes'
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
-
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl">Change password</CardTitle>
-          <CardDescription className="text-sm">
-            Update your password to keep your account secure.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">New password</Label>
-            <Input
-              id="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm new password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button
-            onClick={handleUpdatePassword}
-            disabled={loading || !newPassword || !confirmPassword}
-            size="default"
-            className="min-w-[160px]"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              'Update password'
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
-
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl">Account statistics</CardTitle>
-          <CardDescription className="text-sm">
-            Key usage metrics and account milestones.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {statsRows.map((row, index) => (
-              <div key={row.label}>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-muted-foreground">{row.label}</span>
-                  <span className="text-sm font-semibold">{row.value}</span>
-                </div>
-                {index < statsRows.length - 1 && (
-                  <Separator className="bg-border/50" />
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
       </Card>
     </div>
   )

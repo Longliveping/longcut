@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { transcriptSchema } from '@/lib/validation';
-import { createClient } from '@/lib/supabase/server';
 import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
 import { hasUnlimitedVideoAllowance } from '@/lib/access-control';
 import {
@@ -10,6 +9,7 @@ import {
   IMAGE_TIER_LIMITS,
 } from '@/lib/image-generation-manager';
 import { TranscriptSegment } from '@/lib/types';
+import { requireSession } from '@/lib/auth/server';
 
 const requestSchema = z.object({
   videoId: z.string().min(5),
@@ -186,10 +186,9 @@ async function handler(req: NextRequest) {
       aspectRatio,
       style,
     } = parsed.data;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+
+    const session = await requireSession();
+    const user = session.user;
 
     if (!user) {
       return NextResponse.json(
@@ -214,8 +213,8 @@ async function handler(req: NextRequest) {
 
     // Enforce quota for non-whitelisted users
     const generationDecision = unlimited
-      ? { allowed: true, reason: 'OK', stats: null, subscription: null }
-      : await canGenerateImage(user.id, { client: supabase });
+      ? { allowed: true, reason: 'OK' as const, stats: null, subscription: null }
+      : await canGenerateImage(user.id);
 
     if (!generationDecision.allowed) {
       const tier = generationDecision.subscription?.tier ?? 'free';
@@ -265,7 +264,6 @@ async function handler(req: NextRequest) {
         statsSnapshot: generationDecision.stats,
         videoAnalysisId: null,
         counted: true,
-        client: supabase,
       });
 
       if (!consumeResult.success) {

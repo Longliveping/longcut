@@ -1,5 +1,4 @@
-import type { User } from '@supabase/supabase-js';
-
+// Simple unlimited access check for whitelisted users
 const unlimitedVideoUsers = new Set(
   (process.env.UNLIMITED_VIDEO_USERS ?? '')
     .split(',')
@@ -7,7 +6,7 @@ const unlimitedVideoUsers = new Set(
     .filter(Boolean)
 );
 
-export function hasUnlimitedVideoAllowance(user: User | null | undefined): boolean {
+export function hasUnlimitedVideoAllowance(user: { id: string; email?: string | null } | null | undefined): boolean {
   if (!user) {
     return false;
   }

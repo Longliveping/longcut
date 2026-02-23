@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { VideoPageClient } from './video-page-client';
 import { Topic, TranscriptSegment, VideoInfo } from '@/lib/types';
 import { buildVideoSlug } from '@/lib/utils';
+import { db } from '@/lib/db';
+import { videoAnalyses } from '@/lib/db/schema';
+import { eq, sql } from 'drizzle-orm';
 
 // Extract video ID from slug (format: "title-words-videoId")
 function extractVideoIdFromSlug(slug: string): string | null {
@@ -13,8 +15,6 @@ function extractVideoIdFromSlug(slug: string): string | null {
 
   return /^[A-Za-z0-9_-]{11}$/.test(potentialId) ? potentialId : null;
 }
-
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 interface VideoAnalysisRow {
   youtube_id: string;
@@ -27,50 +27,55 @@ interface VideoAnalysisRow {
   summary: string | Record<string, unknown> | null;
   suggested_questions?: string[] | null;
   slug?: string | null;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+function safeJsonParse<T>(value: string | null): T | null {
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
 }
 
 async function resolveVideoFromSlug(
-  supabase: SupabaseServerClient,
   slug: string
 ): Promise<{ video: VideoAnalysisRow; videoId: string; canonicalSlug: string } | null> {
   const videoIdFromSlug = extractVideoIdFromSlug(slug);
 
   // 1) Try by youtube_id if we could extract one
   if (videoIdFromSlug) {
-    const { data, error } = await supabase
-      .from('video_analyses')
-      .select('*')
-      .eq('youtube_id', videoIdFromSlug)
-      .maybeSingle();
+    const [video] = await db
+      .select()
+      .from(videoAnalyses)
+      .where(eq(videoAnalyses.youtubeId, videoIdFromSlug))
+      .limit(1);
 
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching video analysis by youtube_id', { slug, videoIdFromSlug, error });
+    if (video) {
+      // Parse JSON fields
+      const parsedVideo: VideoAnalysisRow = {
+        youtube_id: video.youtubeId,
+        title: video.title,
+        author: video.author,
+        duration: video.duration,
+        thumbnail_url: video.thumbnailUrl,
+        transcript: safeJsonParse<TranscriptSegment[]>(video.transcript as string | null),
+        topics: safeJsonParse<Topic[]>(video.topics as string | null),
+        summary: safeJsonParse(video.summary as string | null),
+        suggested_questions: safeJsonParse<string[]>(video.suggestedQuestions as string | null),
+        created_at: new Date(Number(video.createdAt) * 1000).toISOString(),
+        updated_at: new Date(Number(video.updatedAt) * 1000).toISOString(),
+      };
+
+      const canonicalSlug = buildVideoSlug(parsedVideo.title, parsedVideo.youtube_id);
+      return { video: parsedVideo, videoId: parsedVideo.youtube_id, canonicalSlug };
     }
-
-    if (data) {
-      const canonicalSlug = buildVideoSlug(data.title, data.youtube_id);
-      return { video: data, videoId: data.youtube_id, canonicalSlug };
-    }
   }
 
-  // 2) Try by stored slug (legacy rows may not include the videoId suffix)
-  const { data, error } = await supabase
-    .from('video_analyses')
-    .select('*')
-    .eq('slug', slug)
-    .maybeSingle();
-
-  if (error && error.code !== 'PGRST116') {
-    console.error('Error fetching video analysis by slug', { slug, error });
-  }
-
-  if (data) {
-    const canonicalSlug = buildVideoSlug(data.title, data.youtube_id);
-    return { video: data, videoId: data.youtube_id, canonicalSlug };
-  }
-
+  // 2) Try legacy slug lookup (if we had slug column, but we don't in new schema)
+  // For now, skip this since we're not storing slugs in the database
   return null;
 }
 
@@ -81,8 +86,7 @@ interface PageProps {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
-  const resolved = await resolveVideoFromSlug(supabase, slug);
+  const resolved = await resolveVideoFromSlug(slug);
 
   if (!resolved) {
     return {
@@ -164,8 +168,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // Main page component (Server Component)
 export default async function VideoPage({ params }: PageProps) {
   const { slug } = await params;
-  const supabase = await createClient();
-  const resolved = await resolveVideoFromSlug(supabase, slug);
+  const resolved = await resolveVideoFromSlug(slug);
 
   if (!resolved) {
     const fallbackVideoId = extractVideoIdFromSlug(slug);

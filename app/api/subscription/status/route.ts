@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
 import { getUserSubscriptionStatus, getUsageStats } from '@/lib/subscription-manager';
+import { requireSession } from '@/lib/auth/server';
 
 /**
  * GET /api/subscription/status
@@ -29,10 +29,8 @@ import { getUserSubscriptionStatus, getUsageStats } from '@/lib/subscription-man
 async function handler(_req: NextRequest) {
   try {
     // Get authenticated user
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const session = await requireSession();
+    const user = session.user;
 
     if (!user) {
       return NextResponse.json(
@@ -42,7 +40,7 @@ async function handler(_req: NextRequest) {
     }
 
     // Get subscription status
-    const subscription = await getUserSubscriptionStatus(user.id, { client: supabase });
+    const subscription = await getUserSubscriptionStatus(user.id);
 
     if (!subscription) {
       return NextResponse.json(
@@ -52,7 +50,7 @@ async function handler(_req: NextRequest) {
     }
 
     // Get usage statistics
-    const stats = await getUsageStats(user.id, { client: supabase });
+    const stats = await getUsageStats(user.id);
 
     if (!stats) {
       return NextResponse.json(
@@ -62,7 +60,7 @@ async function handler(_req: NextRequest) {
     }
 
     const nextBillingDate = subscription.currentPeriodEnd
-      ? subscription.currentPeriodEnd.toISOString()
+      ? new Date(subscription.currentPeriodEnd.getTime()).toISOString()
       : null;
 
     const willConsumeTopup = stats.baseRemaining <= 0 && stats.topupRemaining > 0;
@@ -76,8 +74,8 @@ async function handler(_req: NextRequest) {
       canPurchaseTopup: subscription.tier === 'pro',
       nextBillingDate,
       period: {
-        start: stats.periodStart.toISOString(),
-        end: stats.periodEnd.toISOString(),
+        start: new Date(stats.periodStart * 1000).toISOString(),
+        end: new Date(stats.periodEnd * 1000).toISOString(),
       },
       usage: {
         counted: stats.counted,

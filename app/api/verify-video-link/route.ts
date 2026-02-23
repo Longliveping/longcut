@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
 import { ensureUserVideoLink } from '@/lib/video-save-utils';
+import { requireSession } from '@/lib/auth/server';
 
 /**
  * Verifies and creates a user_videos link if missing.
@@ -21,10 +21,8 @@ async function handler(req: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
+    const session = await requireSession();
+    const user = session.user;
 
     if (!user) {
       return NextResponse.json(
@@ -33,7 +31,7 @@ async function handler(req: NextRequest) {
       );
     }
 
-    const result = await ensureUserVideoLink(supabase, user.id, videoId);
+    const result = await ensureUserVideoLink(user.id, videoId);
 
     if (result.error && !result.linked) {
       console.error(
@@ -48,7 +46,8 @@ async function handler(req: NextRequest) {
 
     return NextResponse.json({
       linked: result.linked,
-      videoId: result.videoId
+      videoId: result.videoId,
+      error: result.error,
     });
   } catch (error) {
     console.error('[verify-video-link] Unexpected error:', error);

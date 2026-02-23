@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth/server'
 import { getUsageStats, getUserSubscriptionStatus } from '@/lib/subscription-manager'
+import { db } from '@/lib/db'
+import { userVideos } from '@/lib/db/schema'
+import { eq, count } from 'drizzle-orm'
 import SettingsForm from './settings-form'
 
 // Force dynamic rendering to prevent caching of subscription status
@@ -8,32 +11,23 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-
-  if (error || !user) {
+  const session = await getSession()
+  if (!session?.user) {
     redirect('/')
   }
+  const user = session.user
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  // Count user's videos
+  const videoCountResult = await db
+    .select({ count: count() })
+    .from(userVideos)
+    .where(eq(userVideos.userId, user.id))
 
-  const { count: videoCount } = await supabase
-    .from('user_videos')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
+  const videoCount = videoCountResult[0]?.count ?? 0
 
   // Always fetch subscription and usage for authenticated users
-  // getUserSubscriptionStatus returns a default free-tier object if no profile exists
-  const subscription = await getUserSubscriptionStatus(user.id, { client: supabase })
-  const usage = await getUsageStats(user.id, { client: supabase })
+  const subscription = await getUserSubscriptionStatus(user.id)
+  const usage = await getUsageStats(user.id)
 
   // Create subscription summary for all users (free and pro)
   const subscriptionSummary = subscription && usage
@@ -45,10 +39,10 @@ export default async function SettingsPage() {
         isPastDue: subscription.status === 'past_due',
         canPurchaseTopup: subscription.tier === 'pro',
         nextBillingDate: subscription.currentPeriodEnd
-          ? subscription.currentPeriodEnd.toISOString()
+          ? new Date(subscription.currentPeriodEnd.getTime()).toISOString()
           : null,
-        periodStart: usage.periodStart.toISOString(),
-        periodEnd: usage.periodEnd.toISOString(),
+        periodStart: new Date(usage.periodStart * 1000).toISOString(),
+        periodEnd: new Date(usage.periodEnd * 1000).toISOString(),
         usage: {
           counted: usage.counted,
           cached: usage.cached,
@@ -68,8 +62,7 @@ export default async function SettingsPage() {
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
       <SettingsForm
         user={user}
-        profile={profile}
-        videoCount={videoCount ?? 0}
+        videoCount={videoCount}
         subscription={subscriptionSummary}
       />
     </div>

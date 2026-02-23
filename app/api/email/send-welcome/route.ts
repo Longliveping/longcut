@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as postmark from 'postmark';
 import { LinkTrackingOptions } from 'postmark/dist/client/models/message/SupportingTypes';
-import { createServiceRoleClient } from '@/lib/supabase/admin';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { getWelcomeSubject, getWelcomeHtmlBody } from '@/lib/email/templates/welcome';
 import { z } from 'zod';
 
@@ -16,7 +18,7 @@ const requestSchema = z.object({
   fullName: z.string().nullable().optional(),
 });
 
-// Validate internal API key - this endpoint is only called by pg_net
+// Validate internal API key - this endpoint is only called by internal services
 function validateInternalApiKey(req: NextRequest): boolean {
   const apiKey = req.headers.get('X-Internal-API-Key');
   const expectedKey = process.env.INTERNAL_API_KEY;
@@ -65,26 +67,14 @@ export async function POST(req: NextRequest) {
     const { emailId, userId, email, fullName } = parseResult.data;
 
     // Check if user still exists (they might have deleted their account)
-    const supabase = createServiceRoleClient();
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('id, email')
-      .eq('id', userId)
-      .single();
+    const [user] = await db
+      .select({ id: users.id, email: users.email })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
 
-    if (profileError || !profile) {
+    if (!user) {
       console.log(`User ${userId} no longer exists, skipping welcome email`);
-
-      // Mark as cancelled in the database
-      // Type assertion needed until TypeScript types are regenerated after migration
-      await (supabase as unknown as { from: (table: string) => ReturnType<typeof supabase.from> })
-        .from('pending_welcome_emails')
-        .update({
-          status: 'cancelled',
-          last_error: 'User account no longer exists',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', emailId);
 
       return NextResponse.json({
         success: false,

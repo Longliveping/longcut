@@ -11,7 +11,7 @@ import {
   CardHeader,
 } from '@/components/ui/card'
 import { startCheckout, openBillingPortal } from '@/lib/stripe-actions'
-import type { SubscriptionStatus, SubscriptionTier } from '@/lib/subscription-manager'
+import type { SubscriptionStatus, SubscriptionTier } from '@/lib/subscription-types'
 import { toast } from 'sonner'
 import { CheckCircle2, Infinity, Layers, Loader2, Package2 } from 'lucide-react'
 import { cn } from '@/lib/utils'

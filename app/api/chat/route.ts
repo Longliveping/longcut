@@ -5,11 +5,11 @@ import { extractTimestamps, parseTimestamp } from '@/lib/timestamp-utils';
 import { chatRequestSchema, formatValidationError } from '@/lib/validation';
 import { RateLimiter, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limiter';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
 import { withSecurity } from '@/lib/security-middleware';
 import { generateAIResponse } from '@/lib/ai-client';
 import { chatResponseSchema } from '@/lib/schemas';
 import { getLanguageName } from '@/lib/language-utils';
+import { requireSession } from '@/lib/auth/server';
 
 function formatTranscriptForContext(segments: TranscriptSegment[]): string {
   return segments.map(s => {
@@ -94,8 +94,8 @@ async function handler(request: NextRequest) {
     const { message, transcript, topics, chatHistory, targetLanguage } = validatedData;
 
     // Check rate limiting
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const session = await requireSession();
+    const user = session.user;
     const rateLimitConfig = user ? RATE_LIMITS.AUTH_CHAT : RATE_LIMITS.ANON_CHAT;
     const rateLimitResult = await RateLimiter.check('chat', rateLimitConfig);
 

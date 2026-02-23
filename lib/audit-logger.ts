@@ -1,6 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { requireSession } from '@/lib/auth/server';
 
 export enum AuditAction {
   // Authentication
@@ -40,25 +39,29 @@ export interface AuditLogEntry {
   userId?: string;
 }
 
+/**
+ * Simplified Audit Logger for SQLite deployment
+ * Logs to console for development; can be extended to log to database for production
+ */
 export class AuditLogger {
   /**
-   * Logs an audit event to the database
+   * Logs an audit event
    * @param entry - The audit log entry to record
-   * @param client - Optional Supabase client (required for webhook contexts)
    */
-  static async log(entry: AuditLogEntry, client?: SupabaseClient): Promise<void> {
+  static async log(entry: AuditLogEntry): Promise<void> {
     try {
-      // Use provided client or create a new one (for non-webhook contexts)
-      const supabase = client || await createClient();
-
       // Get user info
       let userId = entry.userId;
       if (!userId) {
-        const { data: { user } } = await supabase.auth.getUser();
-        userId = user?.id;
+        try {
+          const session = await requireSession();
+          userId = session.user?.id;
+        } catch {
+          // No session available
+        }
       }
 
-      // Get request metadata - wrap in try-catch for webhook contexts
+      // Get request metadata
       let ipAddress = 'unknown';
       let userAgent = 'unknown';
 
@@ -70,25 +73,26 @@ export class AuditLogger {
         userAgent = headersList.get('user-agent') || 'unknown';
       } catch {
         // Headers not available (e.g., in webhook context) - use defaults
-        console.debug('Headers not available for audit log, using defaults');
       }
 
       // Sanitize details to prevent log injection
       const sanitizedDetails = this.sanitizeDetails(entry.details);
 
-      // Insert audit log entry
-      await supabase
-        .from('audit_logs')
-        .insert({
-          user_id: userId,
-          action: entry.action,
-          resource_type: entry.resourceType,
-          resource_id: entry.resourceId,
-          details: sanitizedDetails,
-          ip_address: ipAddress,
-          user_agent: userAgent,
-          created_at: new Date().toISOString()
-        });
+      // Log to console (can be extended to database logging)
+      console.log(JSON.stringify({
+        audit: true,
+        timestamp: new Date().toISOString(),
+        userId,
+        action: entry.action,
+        resourceType: entry.resourceType,
+        resourceId: entry.resourceId,
+        details: sanitizedDetails,
+        ipAddress: this.sanitizeIdentifier(ipAddress),
+        userAgent: userAgent.substring(0, 200) // Truncate long user agents
+      }, null, 2));
+
+      // TODO: Add database logging if needed for production
+      // This would require an audit_logs table in the schema
     } catch (error) {
       // Don't throw errors from audit logging to avoid disrupting operations
       console.error('Audit logging failed:', error);

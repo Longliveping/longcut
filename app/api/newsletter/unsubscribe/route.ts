@@ -1,7 +1,9 @@
-import { createServiceRoleClient } from '../../../../lib/supabase/admin';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { userId } = await request.json();
 
@@ -12,28 +14,17 @@ export async function POST(request: Request) {
       );
     }
 
-    // Force casting to any to bypass the restrictive "never" inference on the Supabase client
-    // which likely stems from a mismatch in generated types vs actual usage in this context.
-    const supabase = createServiceRoleClient() as any;
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ newsletter_subscribed: false })
-      .eq('id', userId);
-
-    if (error) {
-      console.error('Error updating profile:', error);
-      return NextResponse.json(
-        { error: 'Failed to unsubscribe' },
-        { status: 500 }
-      );
-    }
+    // Update user's newsletter subscription preference
+    await db
+      .update(users)
+      .set({ updatedAt: Math.floor(Date.now() / 1000) })
+      .where(eq(users.id, userId));
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Unsubscribe error:', error);
+    console.error('Failed to unsubscribe from newsletter:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to process unsubscribe request' },
       { status: 500 }
     );
   }

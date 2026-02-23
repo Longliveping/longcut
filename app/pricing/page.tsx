@@ -1,14 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth/server'
 import PricingContent from './pricing-content'
 import { getUserSubscriptionStatus } from '@/lib/subscription-manager'
-import type { SubscriptionStatus, SubscriptionTier } from '@/lib/subscription-manager'
+import type { SubscriptionStatus, SubscriptionTier } from '@/lib/subscription-types'
 
 export default async function PricingPage() {
-  const supabase = await createClient()
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser()
+  let user = null
+  const session = await getSession()
+  user = session?.user ?? null
 
   let tier: SubscriptionTier | 'anonymous' = 'anonymous'
   let status: SubscriptionStatus = null
@@ -17,7 +15,7 @@ export default async function PricingPage() {
   if (user) {
     tier = 'free'
 
-    const subscription = await getUserSubscriptionStatus(user.id, { client: supabase })
+    const subscription = await getUserSubscriptionStatus(user.id)
     if (subscription) {
       tier = subscription.tier
       status = subscription.status

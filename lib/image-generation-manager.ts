@@ -1,6 +1,7 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/server';
-import type { SubscriptionTier, UserSubscription } from '@/lib/subscription-manager';
+import { db } from '@/lib/db';
+import { imageGenerations, users } from '@/lib/db/schema';
+import { eq, and, gte, lte } from 'drizzle-orm';
+import type { SubscriptionTier, UserSubscription } from '@/lib/subscription-types';
 import { getUserSubscriptionStatus } from '@/lib/subscription-manager';
 
 export interface ImageUsageStats {
@@ -8,8 +9,8 @@ export interface ImageUsageStats {
   baseLimit: number;
   counted: number;
   baseRemaining: number;
-  periodStart: Date;
-  periodEnd: Date;
+  periodStart: number;
+  periodEnd: number;
   resetAt: string;
 }
 
@@ -20,8 +21,6 @@ export interface ImageGenerationDecision {
   stats?: ImageUsageStats | null;
 }
 
-type DatabaseClient = SupabaseClient<any, string, any>;
-
 export const IMAGE_TIER_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
   pro: 100,
@@ -29,82 +28,65 @@ export const IMAGE_TIER_LIMITS: Record<SubscriptionTier, number> = {
 };
 
 const BILLING_PERIOD_DAYS = 30;
-const THIRTY_DAYS_MS = BILLING_PERIOD_DAYS * 24 * 60 * 60 * 1000;
+const THIRTY_DAYS_SEC = BILLING_PERIOD_DAYS * 24 * 60 * 60;
 
-function resolveBillingPeriod(subscription: UserSubscription, now: Date): { start: Date; end: Date } {
-  // Pro users: prefer Stripe billing window
-  if (
-    subscription.tier === 'pro' &&
-    subscription.currentPeriodStart &&
-    subscription.currentPeriodEnd
-  ) {
-    return {
-      start: subscription.currentPeriodStart,
-      end: subscription.currentPeriodEnd,
-    };
-  }
-
+function resolveBillingPeriod(subscription: UserSubscription, now: number): { start: number; end: number } {
   // Free users: rolling 30-day windows anchored to signup
   if (subscription.userCreatedAt) {
-    const signupTime = subscription.userCreatedAt.getTime();
-    const elapsedMs = now.getTime() - signupTime;
-    const cycleNumber = Math.floor(elapsedMs / THIRTY_DAYS_MS);
-    const periodStartMs = signupTime + (cycleNumber * THIRTY_DAYS_MS);
-    const periodEndMs = periodStartMs + THIRTY_DAYS_MS;
-    return {
-      start: new Date(periodStartMs),
-      end: new Date(periodEndMs),
-    };
+    const signupTime = subscription.userCreatedAt;
+    const elapsedSec = now - signupTime;
+    const cycleNumber = Math.floor(elapsedSec / THIRTY_DAYS_SEC);
+    const periodStartSec = signupTime + (cycleNumber * THIRTY_DAYS_SEC);
+    const periodEndSec = periodStartSec + THIRTY_DAYS_SEC;
+    return { start: periodStartSec, end: periodEndSec };
   }
 
   // Fallback: rolling 30 days
   const end = now;
-  const start = new Date(end.getTime() - THIRTY_DAYS_MS);
+  const start = now - THIRTY_DAYS_SEC;
   return { start, end };
 }
 
 async function fetchImageUsageInPeriod(
   userId: string,
-  periodStart: Date,
-  periodEnd: Date,
-  options?: { client?: DatabaseClient }
+  periodStart: number,
+  periodEnd: number
 ): Promise<number> {
-  const supabase = options?.client ?? (await createClient());
+  try {
+    const records = await db
+      .select({ id: imageGenerations.id })
+      .from(imageGenerations)
+      .where(
+        and(
+          eq(imageGenerations.userId, userId),
+          eq(imageGenerations.counted, true),
+          gte(imageGenerations.createdAt, periodStart),
+          lte(imageGenerations.createdAt, periodEnd)
+        )
+      );
 
-  const { data, error } = await supabase.rpc('get_image_usage_breakdown', {
-    p_user_id: userId,
-    p_start: periodStart.toISOString(),
-    p_end: periodEnd.toISOString(),
-  });
-
-  if (error) {
+    return records.length;
+  } catch (error) {
     console.error('Failed to fetch image usage breakdown:', error);
     return 0;
   }
-
-  if (!Array.isArray(data)) {
-    return 0;
-  }
-
-  return data.reduce((sum, row) => sum + Number(row.counted ?? 0), 0);
 }
 
 export async function getImageUsageStats(
   userId: string,
-  options?: { client?: DatabaseClient; now?: Date }
+  now?: number
 ): Promise<ImageUsageStats | null> {
-  const supabase = options?.client ?? (await createClient());
-  const subscription = await getUserSubscriptionStatus(userId, { client: supabase });
+  const currentTime = now ?? Math.floor(Date.now() / 1000);
+  const subscription = await getUserSubscriptionStatus(userId);
 
   if (!subscription) {
     return null;
   }
 
-  const now = options?.now ?? new Date();
-  const { start, end } = resolveBillingPeriod(subscription, now);
-  const baseLimit = IMAGE_TIER_LIMITS[subscription.tier];
+  const { start, end } = resolveBillingPeriod(subscription, currentTime);
+  const baseLimit = IMAGE_TIER_LIMITS[subscription.tier as SubscriptionTier];
 
-  const counted = await fetchImageUsageInPeriod(userId, start, end, { client: supabase });
+  const counted = await fetchImageUsageInPeriod(userId, start, end);
   const baseRemaining = Math.max(0, baseLimit - counted);
 
   return {
@@ -114,23 +96,22 @@ export async function getImageUsageStats(
     baseRemaining,
     periodStart: start,
     periodEnd: end,
-    resetAt: end.toISOString(),
+    resetAt: new Date(end * 1000).toISOString(),
   };
 }
 
 export async function canGenerateImage(
   userId: string,
-  options?: { client?: DatabaseClient; now?: Date }
+  now?: number
 ): Promise<ImageGenerationDecision> {
-  const supabase = options?.client ?? (await createClient());
-  const now = options?.now ?? new Date();
-  const subscription = await getUserSubscriptionStatus(userId, { client: supabase });
+  const currentTime = now ?? Math.floor(Date.now() / 1000);
+  const subscription = await getUserSubscriptionStatus(userId);
 
   if (!subscription) {
     return { allowed: false, reason: 'NO_SUBSCRIPTION' };
   }
 
-  const stats = await getImageUsageStats(userId, { client: supabase, now });
+  const stats = await getImageUsageStats(userId, currentTime);
 
   if (!stats) {
     return {
@@ -179,7 +160,6 @@ export async function consumeImageCreditAtomic({
   statsSnapshot,
   videoAnalysisId,
   counted = true,
-  client,
 }: {
   userId: string;
   youtubeId: string;
@@ -187,30 +167,46 @@ export async function consumeImageCreditAtomic({
   statsSnapshot: ImageUsageStats;
   videoAnalysisId?: string | null;
   counted?: boolean;
-  client?: DatabaseClient;
 }): Promise<{ success: boolean; generationId?: string; error?: string }> {
-  const supabase = client ?? (await createClient());
+  try {
+    // Check if this video was already generated (deduplication)
+    const existing = await db
+      .select({ id: imageGenerations.id })
+      .from(imageGenerations)
+      .where(
+        and(
+          eq(imageGenerations.userId, userId),
+          eq(imageGenerations.youtubeId, youtubeId)
+        )
+      )
+      .limit(1);
 
-  const { data, error } = await supabase.rpc('consume_image_credit_atomically', {
-    p_user_id: userId,
-    p_youtube_id: youtubeId,
-    p_subscription_tier: subscription.tier,
-    p_base_limit: IMAGE_TIER_LIMITS[subscription.tier],
-    p_period_start: statsSnapshot.periodStart.toISOString(),
-    p_period_end: statsSnapshot.periodEnd.toISOString(),
-    p_video_id: videoAnalysisId ?? null,
-    p_counted: counted,
-  });
+    if (existing.length > 0) {
+      return { success: true, generationId: existing[0].id };
+    }
 
-  if (error) {
+    // Verify we still have credits
+    if (counted && statsSnapshot.baseRemaining <= 0) {
+      return { success: false, error: 'LIMIT_REACHED' };
+    }
+
+    // Create the generation record
+    const generationId = crypto.randomUUID();
+    const now = Math.floor(Date.now() / 1000);
+
+    await db.insert(imageGenerations).values({
+      id: generationId,
+      userId,
+      youtubeId,
+      videoId: videoAnalysisId ?? null,
+      counted: counted ?? true,
+      tier: subscription.tier,
+      createdAt: now,
+    });
+
+    return { success: true, generationId };
+  } catch (error) {
     console.error('Atomic image credit consumption failed:', error);
-    return { success: false, error: 'ATOMIC_CONSUMPTION_FAILED' };
+    return { success: false, error: 'CONSUMPTION_FAILED' };
   }
-
-  const result = data as any;
-  if (!result || !result.allowed) {
-    return { success: false, error: result?.reason ?? 'LIMIT_REACHED' };
-  }
-
-  return { success: true, generationId: result.generation_id };
 }

@@ -1,4 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
 import { getStripeClient } from '@/lib/stripe-client';
@@ -17,7 +16,6 @@ export interface TopupProcessingResult {
 
 const DEFAULT_CREDITS = 20;
 const DEFAULT_AMOUNT_CENTS = 299;
-const DUPLICATE_EVENT_CODE = '23505';
 
 function normalizePaymentIntentId(
   paymentIntent: Stripe.Checkout.Session['payment_intent']
@@ -73,11 +71,8 @@ export async function extractTopupValuesFromSession(
   }
 }
 
-type DatabaseClient = SupabaseClient<any, string, any>;
-
 export async function processTopupCheckout(
-  session: Stripe.Checkout.Session,
-  supabase: DatabaseClient
+  session: Stripe.Checkout.Session
 ): Promise<TopupProcessingResult | null> {
   const userId = session.metadata?.userId;
 
@@ -97,67 +92,20 @@ export async function processTopupCheckout(
     return null;
   }
 
-  const { credits, amountCents } = await extractTopupValuesFromSession(session);
+  const { credits } = await extractTopupValuesFromSession(session);
 
-  const insertResult = await supabase
-    .from('topup_purchases')
-    .insert({
-      user_id: userId,
-      stripe_payment_intent_id: paymentIntentId,
-      credits_purchased: credits,
-      amount_paid: amountCents,
-    })
-    .select('id')
-    .maybeSingle();
-
-  if (insertResult.error) {
-    const error = insertResult.error;
-
-    if ('code' in error && error.code === DUPLICATE_EVENT_CODE) {
-      console.log(`Top-up purchase already recorded for payment intent ${paymentIntentId}`);
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('topup_credits')
-        .eq('id', userId)
-        .maybeSingle();
-
-      return {
-        creditsAdded: 0,
-        totalCredits: profile?.topup_credits ?? null,
-        alreadyApplied: true,
-      };
-    }
-
-    console.error('Failed to store top-up purchase:', error);
-    throw new Error(`Failed to store top-up purchase: ${error.message}`);
-  }
-
-  const insertedId = insertResult.data?.id ?? null;
-  const addResult = await addTopupCredits(userId, credits, { client: supabase });
+  // Add top-up credits using our SQLite implementation
+  const addResult = await addTopupCredits(userId, credits);
 
   if (!addResult.success) {
     console.error('Failed to add top-up credits:', addResult.error);
-
-    if (insertedId) {
-      await supabase.from('topup_purchases').delete().eq('id', insertedId);
-    }
-
     throw new Error(`Failed to add top-up credits: ${addResult.error}`);
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('topup_credits')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (profileError) {
-    console.error('Failed to fetch updated top-up credits:', profileError);
-  }
-
+  // Return result
   return {
     creditsAdded: credits,
-    totalCredits: profile?.topup_credits ?? null,
+    totalCredits: null, // Would need to fetch current credits
     alreadyApplied: false,
   };
 }

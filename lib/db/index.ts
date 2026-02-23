@@ -6,14 +6,14 @@ let dbInstance: ReturnType<typeof drizzle> | null = null
 
 function getDatabasePath(): string {
   const dbPath = process.env.DATABASE_URL
-  
+
   if (!dbPath) {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('DATABASE_URL environment variable is required in production')
     }
     return './local.db'
   }
-  
+
   return dbPath
 }
 
@@ -24,11 +24,19 @@ export function getDb() {
 
   const dbPath = getDatabasePath()
   const sqlite = new Database(dbPath)
-  
+
   // Enable foreign keys
   sqlite.pragma('foreign_keys = ON')
-  
-  dbInstance = drizzle(sqlite, { schema })
+
+  // Log all SQL queries for debugging
+  sqlite.function('log_sql', (sql) => {
+    console.log('[SQL]', sql)
+  })
+
+  dbInstance = drizzle(sqlite, {
+    schema,
+    logger: true,
+  })
   return dbInstance
 }
 

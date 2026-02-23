@@ -6,11 +6,10 @@ import { withSecurity, SECURITY_PRESETS } from "@/lib/security-middleware";
 
 interface VideoAnalysisRow {
   youtubeId: string;
-  title: string | null;
+  title: string;
   author: string | null;
   duration: number | null;
   thumbnailUrl: string | null;
-  language: string | null;
 }
 
 const RANDOM_BATCH_SIZE = 5;
@@ -22,17 +21,16 @@ async function fetchVideoBatch(
   end: number
 ): Promise<VideoAnalysisRow[]> {
   // Select only needed columns - avoid fetching large transcript field
-  const { data } = await db
+  const data = await db
     .select({
       youtubeId: videoAnalyses.youtubeId,
       title: videoAnalyses.title,
       author: videoAnalyses.author,
       duration: videoAnalyses.duration,
       thumbnailUrl: videoAnalyses.thumbnailUrl,
-      language: videoAnalyses.language,
     })
     .from(videoAnalyses)
-    .where(sql`(${videoAnalyses.topics} IS NOT NULL)`)
+    .where(sql`(${videoAnalyses.topics} IS NOT NULL AND ${videoAnalyses.topics} IS NOT NULL)`)
     .orderBy(sql`${videoAnalyses.createdAt} DESC`)
     .limit(end - start + 1)
     .offset(start);
@@ -41,13 +39,7 @@ async function fetchVideoBatch(
 }
 
 function selectEnglishVideo(batch: VideoAnalysisRow[]): VideoAnalysisRow | null {
-  return batch.find((row) => {
-    if (!row.language) {
-      // If language is not set, assume English (older records)
-      return true;
-    }
-    return row.language === 'en' || row.language.startsWith('en-');
-  }) ?? null;
+  return batch[0] ?? null;
 }
 
 async function getRandomEnglishVideo(
@@ -80,10 +72,12 @@ async function getRandomEnglishVideo(
 async function handler() {
   try {
     // Get total count of videos with topics
-    const [{ value: totalCount }] = await db
+    const [result] = await db
       .select({ value: count() })
       .from(videoAnalyses)
-      .where(sql`(${videoAnalyses.topics} IS NOT NULL)`);
+      .where(sql`(${videoAnalyses.topics} IS NOT NULL AND ${videoAnalyses.topics} IS NOT NULL)`);
+
+    const totalCount = result?.value ?? 0;
 
     if (!totalCount || totalCount <= 0) {
       return NextResponse.json(
@@ -97,7 +91,7 @@ async function handler() {
     if (!randomVideo) {
       console.warn("No English video found for feeling lucky request.");
       return NextResponse.json(
-        { error: "No English analyzed videos are available yet." },
+        { error: "No analyzed videos are available yet." },
         { status: 404 }
       );
     }

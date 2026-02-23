@@ -1,5 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/server';
+import { db } from '@/lib/db';
+import { videoGenerations, users } from '@/lib/db/schema';
+import { gte, lte, and, eq } from 'drizzle-orm';
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -15,13 +16,10 @@ export interface UsageBreakdown {
   byTier: Record<string, { counted: number; cached: number }>;
 }
 
-type UsageTrackerClient = SupabaseClient<any, string, any>;
-
 interface UsageInPeriodParams {
   userId: string;
-  start: Date;
-  end: Date;
-  client?: UsageTrackerClient;
+  start: number; // Unix timestamp
+  end: number; // Unix timestamp
 }
 
 /**
@@ -34,52 +32,69 @@ export function getPeriodBounds(subStart: Date): PeriodBounds {
 }
 
 /**
- * Aggregates usage for a user inside the provided window.
- * Relies on the Supabase RPC `get_usage_breakdown` to avoid downloading every row.
+ * Aggregates usage for a user inside the provided window using SQLite.
  */
 export async function fetchUsageBreakdown({
   userId,
   start,
   end,
-  client,
 }: UsageInPeriodParams): Promise<UsageBreakdown> {
-  const supabase = client ?? (await createClient());
+  try {
+    // Get user's tier from users table
+    const userRecords = await db
+      .select({ tier: users.tier })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
 
-  const { data, error } = await supabase.rpc('get_usage_breakdown', {
-    p_user_id: userId,
-    p_start: start.toISOString(),
-    p_end: end.toISOString(),
-  });
+    const user = userRecords[0];
+    const tier = user?.tier ?? 'free';
 
-  if (error) {
-    console.error('Failed to compute usage breakdown:', error);
-    throw error;
-  }
+    // Count generations in the period
+    const generationRecords = await db
+      .select({
+        counted: videoGenerations.counted,
+      })
+      .from(videoGenerations)
+      .where(
+        and(
+          eq(videoGenerations.userId, userId),
+          gte(videoGenerations.createdAt, start),
+          lte(videoGenerations.createdAt, end)
+        )
+      );
 
-  const breakdown: UsageBreakdown = {
-    counted: 0,
-    cached: 0,
-    total: 0,
-    byTier: {},
-  };
+    let counted = 0;
+    let cached = 0;
 
-  if (!Array.isArray(data)) {
+    for (const gen of generationRecords) {
+      if (gen.counted) {
+        counted += 1;
+      } else {
+        cached += 1;
+      }
+    }
+
+    const breakdown: UsageBreakdown = {
+      counted,
+      cached,
+      total: counted + cached,
+      byTier: {
+        [tier]: { counted, cached },
+      },
+    };
+
     return breakdown;
+  } catch (error) {
+    console.error('Failed to compute usage breakdown:', error);
+    // Return empty breakdown on error
+    return {
+      counted: 0,
+      cached: 0,
+      total: 0,
+      byTier: {},
+    };
   }
-
-  for (const row of data) {
-    const tier = row.subscription_tier ?? 'unknown';
-    const counted = Number(row.counted ?? 0);
-    const cached = Number(row.cached ?? 0);
-
-    breakdown.byTier[tier] = { counted, cached };
-    breakdown.counted += counted;
-    breakdown.cached += cached;
-  }
-
-  breakdown.total = breakdown.counted + breakdown.cached;
-
-  return breakdown;
 }
 
 interface RemainingCreditParams {

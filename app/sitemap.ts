@@ -1,31 +1,29 @@
 import { MetadataRoute } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { db } from '@/lib/db';
+import { videoAnalyses } from '@/lib/db/schema';
+import { desc } from 'drizzle-orm';
 import { buildVideoSlug } from '@/lib/utils';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = await createClient();
-
   // Fetch all videos with their slugs and update times
-  const { data: videos } = await supabase
-    .from('video_analyses')
-    .select('slug, updated_at, youtube_id, title')
-    .order('updated_at', { ascending: false })
+  const videos = await db
+    .select({
+      youtubeId: videoAnalyses.youtubeId,
+      title: videoAnalyses.title,
+      updatedAt: videoAnalyses.updatedAt,
+    })
+    .from(videoAnalyses)
+    .orderBy(desc(videoAnalyses.updatedAt))
     .limit(50000); // Google's sitemap limit
 
-  const normalizeSlug = (video: { slug: string | null; youtube_id: string | null; title: string | null }) => {
-    const youtubeId = video.youtube_id ?? '';
-    const hasCanonicalSuffix = Boolean(video.slug && youtubeId && video.slug.endsWith(youtubeId));
+  const normalizeSlug = (video: { youtubeId: string; title: string | null }) => {
+    const youtubeId = video.youtubeId ?? '';
     const canonicalSlug = youtubeId ? buildVideoSlug(video.title, youtubeId) : null;
-
-    if (hasCanonicalSuffix) {
-      return video.slug;
-    }
-
-    return canonicalSlug || video.slug || null;
+    return canonicalSlug || null;
   };
 
   // Generate URLs for all video pages
-  const videoUrls: MetadataRoute.Sitemap = (videos || [])
+  const videoUrls: MetadataRoute.Sitemap = videos
     .map(video => {
       const slug = normalizeSlug(video);
 
@@ -35,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       return {
         url: `https://longcut.ai/v/${slug}`,
-        lastModified: new Date(video.updated_at),
+        lastModified: new Date(video.updatedAt * 1000),
         changeFrequency: 'monthly' as const,
         priority: 0.8
       };

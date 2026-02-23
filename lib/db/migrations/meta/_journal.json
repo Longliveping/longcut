@@ -15,6 +15,20 @@
       "when": 1771743421278,
       "tag": "0001_strange_shockwave",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1771773780187,
+      "tag": "0002_overconfident_namora",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1771773980112,
+      "tag": "0003_rich_darwin",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { withSecurity, SECURITY_PRESETS } from '@/lib/security-middleware';
 import { hasUnlimitedVideoAllowance } from '@/lib/access-control';
 import {
@@ -7,13 +6,12 @@ import {
   getImageUsageStats,
   IMAGE_TIER_LIMITS,
 } from '@/lib/image-generation-manager';
+import { requireSession } from '@/lib/auth/server';
 
 async function handler() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const session = await requireSession();
+    const user = session.user;
 
     if (!user) {
       return NextResponse.json({
@@ -43,10 +41,8 @@ async function handler() {
       });
     }
 
-    const decision = await canGenerateImage(user.id, { client: supabase });
-    const stats =
-      decision.stats ??
-      (await getImageUsageStats(user.id, { client: supabase }));
+    const decision = await canGenerateImage(user.id);
+    const stats = decision.stats ?? (await getImageUsageStats(user.id));
 
     const tier = decision.subscription?.tier ?? 'free';
     const resetAt =

@@ -1,8 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
-import type { SubscriptionTier } from '@/lib/subscription-manager';
+import type { SubscriptionTier } from '@/lib/subscription-types';
 import crypto from 'crypto';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { rateLimits } from '@/lib/db/schema';
+import { eq, gte, lt, desc } from 'drizzle-orm';
+import { requireSession } from '@/lib/auth/server';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -21,13 +24,15 @@ export class RateLimiter {
   private static async getIdentifier(customId?: string): Promise<string> {
     if (customId) return customId;
 
-    const supabase = await createClient();
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
+    try {
+      const session = await requireSession();
+      const user = session.user;
 
-    if (user) {
-      return `user:${user.id}`;
+      if (user) {
+        return `user:${user.id}`;
+      }
+    } catch {
+      // No user session, fall through to IP-based identification
     }
 
     // For anonymous users, use IP address hash
@@ -48,37 +53,35 @@ export class RateLimiter {
     const identifier = await this.getIdentifier(config.identifier);
     const rateLimitKey = `ratelimit:${key}:${identifier}`;
 
-    const supabase = await createClient();
     const now = Date.now();
     const windowStart = now - config.windowMs;
 
     try {
-      // Count recent requests without modifying
-      const { data: recentRequests, error: countError } = await supabase
-        .from('rate_limits')
-        .select('id')
-        .eq('key', rateLimitKey)
-        .gte('timestamp', new Date(windowStart).toISOString());
+      // Count recent requests without modifying (using Unix timestamp)
+      const windowStartSec = Math.floor(windowStart / 1000);
 
-      if (countError) throw countError;
+      const recentRequests = await db
+        .select({ id: rateLimits.id, timestamp: rateLimits.timestamp })
+        .from(rateLimits)
+        .where(eq(rateLimits.key, rateLimitKey))
+        .limit(1000); // Get recent entries to filter client-side
 
-      const requestCount = recentRequests?.length || 0;
+      const requestCount = recentRequests.filter(
+        r => r.timestamp >= windowStartSec
+      ).length;
+
       const remaining = Math.max(0, config.maxRequests - requestCount);
       const resetAt = new Date(now + config.windowMs);
 
       if (requestCount >= config.maxRequests) {
         // Calculate when the oldest request will expire
-        const { data: oldestRequest } = await supabase
-          .from('rate_limits')
-          .select('timestamp')
-          .eq('key', rateLimitKey)
-          .order('timestamp', { ascending: true })
-          .limit(1)
-          .single();
+        const oldestRequest = recentRequests
+          .filter(r => r.timestamp >= windowStartSec)
+          .sort((a, b) => a.timestamp - b.timestamp)[0];
 
         let retryAfter = Math.ceil(config.windowMs / 1000);
         if (oldestRequest) {
-          const oldestTime = new Date(oldestRequest.timestamp).getTime();
+          const oldestTime = oldestRequest.timestamp * 1000;
           retryAfter = Math.ceil((oldestTime + config.windowMs - now) / 1000);
         }
 
@@ -113,43 +116,40 @@ export class RateLimiter {
     const identifier = await this.getIdentifier(config.identifier);
     const rateLimitKey = `ratelimit:${key}:${identifier}`;
 
-    const supabase = await createClient();
     const now = Date.now();
     const windowStart = now - config.windowMs;
+    const windowStartSec = Math.floor(windowStart / 1000);
+    const nowSec = Math.floor(now / 1000);
 
     try {
-      // First, clean up old entries
-      await supabase
-        .from('rate_limits')
-        .delete()
-        .lt('timestamp', new Date(windowStart).toISOString());
+      // First, clean up old entries (older than window)
+      await db
+        .delete(rateLimits)
+        .where(lt(rateLimits.timestamp, windowStartSec));
 
       // Count recent requests
-      const { data: recentRequests, error: countError } = await supabase
-        .from('rate_limits')
-        .select('id')
-        .eq('key', rateLimitKey)
-        .gte('timestamp', new Date(windowStart).toISOString());
+      const recentRequests = await db
+        .select({ id: rateLimits.id, timestamp: rateLimits.timestamp })
+        .from(rateLimits)
+        .where(eq(rateLimits.key, rateLimitKey))
+        .limit(1000);
 
-      if (countError) throw countError;
+      const requestCount = recentRequests.filter(
+        r => r.timestamp >= windowStartSec
+      ).length;
 
-      const requestCount = recentRequests?.length || 0;
       const remaining = Math.max(0, config.maxRequests - requestCount);
       const resetAt = new Date(now + config.windowMs);
 
       if (requestCount >= config.maxRequests) {
         // Calculate when the oldest request will expire
-        const { data: oldestRequest } = await supabase
-          .from('rate_limits')
-          .select('timestamp')
-          .eq('key', rateLimitKey)
-          .order('timestamp', { ascending: true })
-          .limit(1)
-          .single();
+        const oldestRequest = recentRequests
+          .filter(r => r.timestamp >= windowStartSec)
+          .sort((a, b) => a.timestamp - b.timestamp)[0];
 
         let retryAfter = Math.ceil(config.windowMs / 1000);
         if (oldestRequest) {
-          const oldestTime = new Date(oldestRequest.timestamp).getTime();
+          const oldestTime = oldestRequest.timestamp * 1000;
           retryAfter = Math.ceil((oldestTime + config.windowMs - now) / 1000);
         }
 
@@ -162,17 +162,12 @@ export class RateLimiter {
       }
 
       // Record this request
-      const { error: insertError } = await supabase.from('rate_limits').insert({
+      await db.insert(rateLimits).values({
+        id: crypto.randomUUID(),
         key: rateLimitKey,
-        timestamp: new Date(now).toISOString(),
-        identifier
+        identifier,
+        timestamp: nowSec
       });
-
-      if (insertError) {
-        console.error('Failed to insert rate limit record:', insertError);
-        console.error('Rate limit key:', rateLimitKey);
-        console.error('Identifier:', identifier);
-      }
 
       return {
         allowed: true,
@@ -194,8 +189,7 @@ export class RateLimiter {
     const id = await this.getIdentifier(identifier);
     const rateLimitKey = `ratelimit:${key}:${id}`;
 
-    const supabase = await createClient();
-    await supabase.from('rate_limits').delete().eq('key', rateLimitKey);
+    await db.delete(rateLimits).where(eq(rateLimits.key, rateLimitKey));
   }
 }
 

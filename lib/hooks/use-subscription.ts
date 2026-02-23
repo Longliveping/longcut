@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
-import { createClient } from '@/lib/supabase/client';
 
 type SubscriptionStatusState =
   | 'active'
@@ -58,7 +57,6 @@ export function useSubscription({ user, onAuthRequired }: UseSubscriptionOptions
   const subscriptionStatusFetchedAtRef = useRef<number | null>(null);
   const subscriptionStatusRef = useRef<SubscriptionStatusResponse | null>(null);
   const lastVisibleRef = useRef<number>(Date.now());
-  const retryCountRef = useRef<number>(0);
   const lastFailureTimeRef = useRef<number>(0);
   const lastErrorToastRef = useRef<number>(0);
 
@@ -121,28 +119,10 @@ export function useSubscription({ user, onAuthRequired }: UseSubscriptionOptions
         });
 
         if (response.status === 401) {
-          // Try to refresh the session before giving up
-          if (retryCountRef.current < 1) {
-            retryCountRef.current += 1;
-            try {
-              const supabase = createClient();
-              const { data: { session } } = await supabase.auth.getSession();
-              if (session) {
-                // Session refreshed - retry the request
-                retryCountRef.current = 0;
-                return fetchSubscriptionStatus({ force: true });
-              }
-            } catch (refreshErr) {
-              console.warn('Session refresh failed:', refreshErr);
-            }
-          }
-          retryCountRef.current = 0;
           lastFailureTimeRef.current = Date.now();
           onAuthRequired?.();
           return null;
         }
-
-        retryCountRef.current = 0;
 
         if (!response.ok) {
           lastFailureTimeRef.current = Date.now();

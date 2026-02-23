@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Mark better-sqlite3 as external for server components (don't bundle for client)
+  serverExternalPackages: ['better-sqlite3'],
   webpack: (config, { isServer }) => {
     // Suppress the punycode deprecation warning
     if (!isServer) {
@@ -23,6 +25,11 @@ const nextConfig: NextConfig = {
         ...config.resolve.fallback,
         punycode: false,
       };
+    }
+
+    // Exclude better-sqlite3 from client bundle (server-only module)
+    if (!isServer) {
+      config.externals = [...(config.externals || []), 'better-sqlite3'];
     }
 
     return config;

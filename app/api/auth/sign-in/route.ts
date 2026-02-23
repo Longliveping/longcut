@@ -1,38 +1,78 @@
-import { auth } from '@/lib/auth/config'
-import { headers } from 'next/headers'
+import { auth } from '@/lib/auth/lucia'
+import { cookies } from 'next/headers'
+import bcrypt from 'bcryptjs'
+import { db } from '@/lib/db'
+import { users, sessions } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
+import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    
-    // Basic validation
+
     if (!body.email || !body.password) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
       )
     }
-    
-    const result = await auth.api.signInEmail({
-      body: {
-        email: body.email,
-        password: body.password,
-      },
-      headers: await headers(),
-    })
-    
-    // Check if user exists (successful authentication)
-    if (!result.user) {
-      return Response.json(
-        { error: 'Authentication failed' },
+
+    const email = body.email.toLowerCase().trim()
+
+    // Find user
+    const existing = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1)
+
+    if (existing.length === 0) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
         { status: 401 }
       )
     }
-    
-    return Response.json(result)
+
+    const user = existing[0]
+
+    // Verify password
+    const isValid = await bcrypt.compare(body.password, user.passwordHash)
+
+    if (!isValid) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      )
+    }
+
+    // Create session manually (Lucia adapter doesn't support createSession)
+    const sessionId = crypto.randomUUID()
+    const expiresAt = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7) // 7 days
+    const now = new Date().toISOString()
+
+    await db.insert(sessions).values({
+      id: sessionId,
+      userId: user.id,
+      expiresAt: expiresAt,
+      createdAt: now,
+      updatedAt: now,
+    })
+
+    const sessionCookie = auth.createSessionCookie(sessionId)
+
+    const cookieStore = await cookies()
+    cookieStore.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      }
+    })
   } catch (error) {
     console.error('Sign-in error:', error)
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )

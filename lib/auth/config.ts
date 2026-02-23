@@ -1,15 +1,19 @@
 import { betterAuth } from 'better-auth'
-import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { db } from '../db'
-import * as schema from '../db/schema'
+import { betterSqlite3 } from 'better-auth/adapters/better-sqlite3'
+import Database from 'better-sqlite3'
+
+const getDatabase = () => {
+  const dbPath = process.env.DATABASE_URL
+  if (!dbPath) {
+    return new Database('./local.db')
+  }
+  return new Database(dbPath)
+}
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: 'sqlite',
-    schema: {
-      user: schema.users,
-      session: schema.sessions,
-    },
+  database: betterSqlite3(getDatabase(), {
+    user: 'users',
+    session: 'sessions',
   }),
   emailAndPassword: {
     enabled: true,
@@ -26,5 +30,7 @@ export const auth = betterAuth({
     },
   },
 })
+
+export const authClient = auth
 
 export type Session = typeof auth.$Infer.Session

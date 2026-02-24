@@ -6,6 +6,7 @@ import { db } from '@/lib/db';
 import { rateLimits } from '@/lib/db/schema';
 import { eq, gte, lt, desc } from 'drizzle-orm';
 import { requireSession } from '@/lib/auth/server';
+import { isAdminEmail } from '@/lib/admin';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -29,6 +30,10 @@ export class RateLimiter {
       const user = session.user;
 
       if (user) {
+        // Check if user is admin - bypass rate limiting
+        if (isAdminEmail(user.email)) {
+          return `admin:${user.id}`;
+        }
         return `user:${user.id}`;
       }
     } catch {
@@ -51,6 +56,16 @@ export class RateLimiter {
     config: RateLimitConfig
   ): Promise<RateLimitResult> {
     const identifier = await this.getIdentifier(config.identifier);
+
+    // Skip rate limiting for admin users
+    if (identifier.startsWith('admin:')) {
+      return {
+        allowed: true,
+        remaining: Number.MAX_SAFE_INTEGER,
+        resetAt: new Date(Date.now() + 86400000) // 24 hours
+      };
+    }
+
     const rateLimitKey = `ratelimit:${key}:${identifier}`;
 
     const now = Date.now();
@@ -114,6 +129,16 @@ export class RateLimiter {
     config: RateLimitConfig
   ): Promise<RateLimitResult> {
     const identifier = await this.getIdentifier(config.identifier);
+
+    // Skip rate limiting for admin users
+    if (identifier.startsWith('admin:')) {
+      return {
+        allowed: true,
+        remaining: Number.MAX_SAFE_INTEGER,
+        resetAt: new Date(Date.now() + 86400000) // 24 hours
+      };
+    }
+
     const rateLimitKey = `ratelimit:${key}:${identifier}`;
 
     const now = Date.now();

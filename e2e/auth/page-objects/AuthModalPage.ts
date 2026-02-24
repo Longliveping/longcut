@@ -43,19 +43,19 @@ export class AuthModalPage extends BasePage {
 
     // Initialize locators
     this.modal = page.locator('[role="dialog"]');
-    this.signInTab = page.locator('button:has-text("Sign In")');
-    this.signUpTab = page.locator('button:has-text("Sign Up")');
+    this.signInTab = page.getByRole('tab', { name: 'Sign In' });
+    this.signUpTab = page.getByRole('tab', { name: 'Sign Up' });
 
     // Sign In elements
     this.signInEmailInput = page.locator('input#signin-email, input[type="email"]:visible');
     this.signInPasswordInput = page.locator('input#signin-password, input[type="password"]:visible');
-    this.signInButton = page.locator('button:has-text("Sign In")');
+    this.signInButton = this.modal.locator('button', { hasText: 'Sign In' }).first();
     this.googleSignInButton = page.locator('button:has-text("Continue with Google")');
 
     // Sign Up elements
     this.signUpEmailInput = page.locator('input#signup-email');
     this.signUpPasswordInput = page.locator('input#signup-password');
-    this.signUpButton = page.locator('button:has-text("Create Account")');
+    this.signUpButton = this.modal.locator('button', { hasText: 'Create Account' }).first();
     this.googleSignUpButton = page.locator('button:has-text("Continue with Google")');
 
     // Success state

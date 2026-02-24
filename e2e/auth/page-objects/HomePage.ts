@@ -20,13 +20,13 @@ export class HomePage extends BasePage {
     super(page, baseUrl);
 
     // Initialize locators
-    this.title = page.getByText('LongCut');
+    this.title = page.getByRole('heading', { name: 'LongCut' });
     this.description = page.getByText('The best way to learn from long videos.');
     this.urlInput = page.locator('input[type="text"], input[placeholder*="YouTube"], input[placeholder*="URL"]');
     this.submitButton = page.locator('button[type="submit"], button:has-text("Analyze"), button:has-text("Go")');
     this.feelingLuckyButton = page.locator('button:has-text("Feeling Lucky")');
     this.modeSelector = page.locator('[data-testid="mode-selector"], .mode-selector');
-    this.signInButton = page.locator('button:has-text("Sign In")');
+    this.signInButton = page.locator('header button:has-text("Sign In")');
   }
 
   /**

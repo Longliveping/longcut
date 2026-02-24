@@ -1,0 +1,1733 @@
+<testsuites id="" name="" tests="13" failures="13" skipped="0" errors="0" time="38.44795">
+<testsuite name="sign-in.spec.ts" timestamp="2026-02-24T03:40:51.028Z" hostname="chromium" tests="13" failures="13" skipped="0" time="7.27" errors="0">
+<testcase name="Sign In - Email and Password › should sign in successfully with valid credentials" classname="sign-in.spec.ts" time="0.525">
+<failure message="sign-in.spec.ts:34:7 should sign in successfully with valid credentials" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:34:7 › Sign In - Email and Password › should sign in successfully with valid credentials 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Email and Password › should show error with invalid credentials" classname="sign-in.spec.ts" time="0.527">
+<failure message="sign-in.spec.ts:65:7 should show error with invalid credentials" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:65:7 › Sign In - Email and Password › should show error with invalid credentials 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Email and Password › should show error with correct email but wrong password" classname="sign-in.spec.ts" time="0.547">
+<failure message="sign-in.spec.ts:94:7 should show error with correct email but wrong password" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:94:7 › Sign In - Email and Password › should show error with correct email but wrong password 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Email and Password › should show error with non-existent email" classname="sign-in.spec.ts" time="0.551">
+<failure message="sign-in.spec.ts:125:7 should show error with non-existent email" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:125:7 › Sign In - Email and Password › should show error with non-existent email 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Email and Password › should disable sign in button with empty fields" classname="sign-in.spec.ts" time="0.558">
+<failure message="sign-in.spec.ts:145:7 should disable sign in button with empty fields" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:145:7 › Sign In - Email and Password › should disable sign in button with empty fields 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Email and Password › should validate email format" classname="sign-in.spec.ts" time="0.559">
+<failure message="sign-in.spec.ts:168:7 should validate email format" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:168:7 › Sign In - Email and Password › should validate email format ─
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Email and Password › should open and close sign in modal" classname="sign-in.spec.ts" time="0.567">
+<failure message="sign-in.spec.ts:188:7 should open and close sign in modal" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:188:7 › Sign In - Email and Password › should open and close sign in modal 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Email and Password › should reload page and show user menu after sign in" classname="sign-in.spec.ts" time="0.577">
+<failure message="sign-in.spec.ts:203:7 should reload page and show user menu after sign in" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:203:7 › Sign In - Email and Password › should reload page and show user menu after sign in 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In Modal - UI Elements › should display correct title and description" classname="sign-in.spec.ts" time="0.568">
+<failure message="sign-in.spec.ts:252:7 should display correct title and description" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:252:7 › Sign In Modal - UI Elements › should display correct title and description 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In Modal - UI Elements › should have email and password input fields" classname="sign-in.spec.ts" time="0.572">
+<failure message="sign-in.spec.ts:264:7 should have email and password input fields" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:264:7 › Sign In Modal - UI Elements › should have email and password input fields 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In Modal - UI Elements › should have sign in button" classname="sign-in.spec.ts" time="0.572">
+<failure message="sign-in.spec.ts:272:7 should have sign in button" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:272:7 › Sign In Modal - UI Elements › should have sign in button ────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In Modal - UI Elements › should switch tabs correctly" classname="sign-in.spec.ts" time="0.577">
+<failure message="sign-in.spec.ts:281:7 should switch tabs correctly" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:281:7 › Sign In Modal - UI Elements › should switch tabs correctly ──
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Sign In - Integration › should allow sign out after successful sign in" classname="sign-in.spec.ts" time="0.57">
+<failure message="sign-in.spec.ts:307:7 should allow sign out after successful sign in" type="FAILURE">
+<![CDATA[  [chromium] › sign-in.spec.ts:307:7 › Sign In - Integration › should allow sign out after successful sign in 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+    Call log:
+      - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+
+       at ../page-objects/BasePage.ts:22
+
+      20 |   async navigate(path: string = ''): Promise<void> {
+      21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
+    > 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });
+         |                     ^
+      23 |   }
+      24 |
+      25 |   /**
+        at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)
+        at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)
+        at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/trace.zip]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/test-failed-1.png]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/video.webm]]
+
+[[ATTACHMENT|artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

@@ -26,6 +26,17 @@ test.describe('Sign Up - Email and Password', () => {
    * TC-001: Successful sign up with valid credentials
    */
   test('should sign up successfully with valid credentials', async ({ page }) => {
+    // Add request logging to debug network issues
+    page.on('request', request => {
+      console.log('Request:', request.method(), request.url());
+    });
+    page.on('response', response => {
+      console.log('Response:', response.status(), response.url());
+    });
+    page.on('requestfailed', request => {
+      console.log('Request failed:', request.url(), request.failure());
+    });
+
     // Open auth modal
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
@@ -42,7 +53,10 @@ test.describe('Sign Up - Email and Password', () => {
     // Submit form
     await authModalPage.clickSignUp();
 
-    // Wait for success message (email confirmation)
+    // Wait a bit to see what happens
+    await page.waitForTimeout(3000);
+
+    // Try to wait for success message (email confirmation)
     await AssertHelper.assertVisible(authModalPage.successMessage, 'Success message should appear after sign up');
 
     // Verify success message contains email

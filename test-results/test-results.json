@@ -1,0 +1,2522 @@
+{
+  "config": {
+    "configFile": "/home/ecs-user/workspace/longcut/playwright.config.ts",
+    "rootDir": "/home/ecs-user/workspace/longcut/e2e/auth/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/ecs-user/workspace/longcut/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/ecs-user/workspace/longcut/e2e/auth/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 45000
+      },
+      {
+        "outputDir": "/home/ecs-user/workspace/longcut/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/ecs-user/workspace/longcut/e2e/auth/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 45000
+      },
+      {
+        "outputDir": "/home/ecs-user/workspace/longcut/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/home/ecs-user/workspace/longcut/e2e/auth/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 45000
+      },
+      {
+        "outputDir": "/home/ecs-user/workspace/longcut/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/home/ecs-user/workspace/longcut/e2e/auth/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 45000
+      },
+      {
+        "outputDir": "/home/ecs-user/workspace/longcut/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/home/ecs-user/workspace/longcut/e2e/auth/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 45000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "test-results/html-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/test-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit-results.xml"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "sign-in.spec.ts",
+      "file": "sign-in.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Sign In - Email and Password",
+          "file": "sign-in.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should sign in successfully with valid credentials",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 172,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:40:51.720Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 188,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:40:52.697Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 165,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:40:53.678Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-b6849-ully-with-valid-credentials-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-cd6d865b08c3d8b05b84",
+              "file": "sign-in.spec.ts",
+              "line": 34,
+              "column": 7
+            },
+            {
+              "title": "should show error with invalid credentials",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 173,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:40:54.637Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 175,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:40:55.607Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 179,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:40:56.586Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a6d4d-or-with-invalid-credentials-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-3c96a3de1f83f20d0e20",
+              "file": "sign-in.spec.ts",
+              "line": 65,
+              "column": 7
+            },
+            {
+              "title": "should show error with correct email but wrong password",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 177,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:40:57.573Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 185,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:40:58.547Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 185,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:40:59.551Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-9bfef-ct-email-but-wrong-password-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-9618bad299aa6e004f8e",
+              "file": "sign-in.spec.ts",
+              "line": 94,
+              "column": 7
+            },
+            {
+              "title": "should show error with non-existent email",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 171,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:00.542Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 209,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:01.516Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 171,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:02.509Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-6d992-ror-with-non-existent-email-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-6641b3eba157c06228ea",
+              "file": "sign-in.spec.ts",
+              "line": 125,
+              "column": 7
+            },
+            {
+              "title": "should disable sign in button with empty fields",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 181,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:03.480Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 191,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:04.454Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 186,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:05.428Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-94dfe-in-button-with-empty-fields-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-29b5e19b4783f4958076",
+              "file": "sign-in.spec.ts",
+              "line": 145,
+              "column": 7
+            },
+            {
+              "title": "should validate email format",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 189,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:06.392Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 176,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:07.371Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 194,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:08.350Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-a5699-hould-validate-email-format-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-e41989051f9319debf6f",
+              "file": "sign-in.spec.ts",
+              "line": 168,
+              "column": 7
+            },
+            {
+              "title": "should open and close sign in modal",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 189,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:09.326Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 184,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:10.329Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 194,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:11.307Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-2b1ad-pen-and-close-sign-in-modal-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-a9b3e95bc1153a1b2b35",
+              "file": "sign-in.spec.ts",
+              "line": 188,
+              "column": 7
+            },
+            {
+              "title": "should reload page and show user menu after sign in",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 183,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:12.296Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 22,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 202,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:13.278Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 23,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 192,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:26:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:14.304Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Email-an-27f10-how-user-menu-after-sign-in-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-5b50c15a8885665b1714",
+              "file": "sign-in.spec.ts",
+              "line": 203,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Sign In Modal - UI Elements",
+          "file": "sign-in.spec.ts",
+          "line": 236,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should display correct title and description",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 24,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 198,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:15.291Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 25,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 186,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:16.282Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 26,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 184,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:17.267Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-42562-rrect-title-and-description-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-93b113d7f39a7c95c018",
+              "file": "sign-in.spec.ts",
+              "line": 252,
+              "column": 7
+            },
+            {
+              "title": "should have email and password input fields",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 27,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 206,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:18.245Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 28,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 183,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:19.267Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 29,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 183,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:20.264Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-6f719-l-and-password-input-fields-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-79fc4b51485c98fb959a",
+              "file": "sign-in.spec.ts",
+              "line": 264,
+              "column": 7
+            },
+            {
+              "title": "should have sign in button",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 30,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 197,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:21.240Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 31,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 172,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:22.241Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 32,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 203,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:23.213Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-b0af4--should-have-sign-in-button-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-1accfb0bd8d0a07cbbec",
+              "file": "sign-in.spec.ts",
+              "line": 272,
+              "column": 7
+            },
+            {
+              "title": "should switch tabs correctly",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 33,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 191,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:24.225Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 34,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 192,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:25.209Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 35,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 194,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:244:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:26.187Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In-Modal---UI-4bef7-hould-switch-tabs-correctly-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-2bf39d3a77a45789457f",
+              "file": "sign-in.spec.ts",
+              "line": 281,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Sign In - Integration",
+          "file": "sign-in.spec.ts",
+          "line": 293,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should allow sign out after successful sign in",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 36,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 178,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-24T03:41:27.186Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 37,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 196,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-02-24T03:41:28.165Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    },
+                    {
+                      "workerIndex": 38,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 196,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20",
+                        "location": {
+                          "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                          "column": 21,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39m../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                            "column": 21,
+                            "line": 22
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n\n\n   at ../page-objects/BasePage.ts:22\n\n  20 |   async navigate(path: string = ''): Promise<void> {\n  21 |     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;\n> 22 |     await this.page.goto(url, { waitUntil: 'networkidle' });\n     |                     ^\n  23 |   }\n  24 |\n  25 |   /**\n    at HomePage.navigate (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts:22:21)\n    at HomePage.goto (/home/ecs-user/workspace/longcut/e2e/auth/page-objects/HomePage.ts:36:16)\n    at /home/ecs-user/workspace/longcut/e2e/auth/tests/sign-in.spec.ts:310:20"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2026-02-24T03:41:29.151Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/ecs-user/workspace/longcut/test-results/artifacts/sign-in-Sign-In---Integrat-22308-ut-after-successful-sign-in-chromium-retry2/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/ecs-user/workspace/longcut/e2e/auth/page-objects/BasePage.ts",
+                        "column": 21,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1029c30c7f8b1b06acf3-57e8db8738119c71fe79",
+              "file": "sign-in.spec.ts",
+              "line": 307,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-02-24T03:40:51.008Z",
+    "duration": 38447.95,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 13,
+    "flaky": 0
+  }
+}

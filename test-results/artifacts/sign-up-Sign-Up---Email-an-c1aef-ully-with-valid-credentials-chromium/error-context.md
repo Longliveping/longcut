@@ -1,0 +1,100 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - banner:
+      - generic:
+        - link [ref=e1] [cursor=pointer]:
+          - /url: /
+          - img [ref=e2]
+        - button [ref=e4]: Sign In
+    - main:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - heading [level=1]: LongCut
+            - paragraph: The best way to learn from long videos.
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                    - textbox:
+                      - /placeholder: Paste Youtube URL link here...
+                  - generic:
+                    - generic:
+                      - button:
+                        - img
+                        - text: I'm feeling lucky
+                      - button [disabled]:
+                        - img
+            - generic:
+              - generic:
+                - heading [level=3]: Don't take the shortcut.
+                - paragraph: LongCut doesn't summarize. We show you where to look instead. Find the highlights. Take notes. Ask questions.
+              - generic:
+                - generic:
+                  - img
+    - contentinfo:
+      - generic:
+        - generic:
+          - img
+          - link:
+            - /url: https://github.com/SamuelZ12/longcut
+            - text: Open Source
+          - generic: •
+          - button: About Us
+          - generic: •
+          - link:
+            - /url: /terms
+            - text: Terms of Service
+          - generic: •
+          - link:
+            - /url: /privacy
+            - text: Privacy Policy
+  - region "Notifications alt+T"
+  - generic [ref=e9] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e10]:
+      - img [ref=e11]
+    - generic [ref=e14]:
+      - button "Open issues overlay" [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: "0"
+          - generic [ref=e18]: "1"
+        - generic [ref=e19]: Issue
+      - button "Collapse issues badge" [ref=e20]:
+        - img [ref=e21]
+  - alert
+  - dialog "Sign in to LongCut" [active] [ref=e24]:
+    - generic [ref=e25]:
+      - heading "Sign in to LongCut" [level=2] [ref=e26]
+      - paragraph [ref=e27]: Create an account or sign in to save your video analyses and access them anytime.
+    - generic [ref=e28]:
+      - tablist [ref=e29]:
+        - tab "Sign In" [ref=e30]
+        - tab "Sign Up" [selected] [ref=e31]
+      - tabpanel "Sign Up" [ref=e32]:
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]: Email
+            - textbox "Email" [ref=e36]:
+              - /placeholder: you@example.com
+              - text: test-1771906464677-k2mst3@e2e.test
+          - generic [ref=e37]:
+            - generic [ref=e38]: Password
+            - textbox "Password" [ref=e39]:
+              - /placeholder: At least 6 characters
+              - text: TestPass123!mm03cyat
+          - alert [ref=e40]:
+            - img [ref=e41]
+            - generic [ref=e43]: Network error. Please check your connection.
+          - button "Create Account" [ref=e44]
+          - paragraph [ref=e45]: By signing up, you agree to our Terms of Service and Privacy Policy
+    - button "Close" [ref=e46]:
+      - img
+      - generic [ref=e47]: Close
+```

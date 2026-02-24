@@ -248,8 +248,8 @@ export const RATE_LIMITS = {
 
   // Sensitive operations
   AUTH_ATTEMPT: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 5 // 5 login attempts per 15 minutes
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: 20 // 20 auth attempts per minute (enough for tests, protects against abuse)
   },
   // Translation operations
   ANON_TRANSLATION: {

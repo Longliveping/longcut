@@ -218,8 +218,8 @@ export class AuthModalPage extends BasePage {
    */
   async getSuccessMessage(): Promise<string> {
     await this.waitForVisible(this.successMessage);
-    const message = this.successMessage.locator('p, div');
-    return await this.getText(message.first);
+    // Get the entire text content of the dialog
+    return await this.successMessage.innerText();
   }
 
   /**

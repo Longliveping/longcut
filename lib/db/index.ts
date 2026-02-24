@@ -40,6 +40,11 @@ export function getDb() {
   return dbInstance
 }
 
-// Legacy exports for backward compatibility
-export const db = getDb()
+// Lazy proxy so the database is only initialized on first access,
+// not at module load time (which would crash during Next.js build).
+export const db = new Proxy({} as ReturnType<typeof getDb>, {
+  get(_, prop) {
+    return (getDb() as any)[prop]
+  },
+})
 export default db

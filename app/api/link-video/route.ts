@@ -3,6 +3,9 @@ import { requireSession } from '@/lib/auth/server';
 import { withSecurity } from '@/lib/security-middleware';
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { getVideoByYoutubeId, linkVideoToUser } from '@/lib/api/videos';
+import { db } from '@/lib/db';
+import { userVideos } from '@/lib/db/schema';
+import { eq, and } from 'drizzle-orm';
 
 async function handler(req: NextRequest) {
   try {
@@ -39,12 +42,28 @@ async function handler(req: NextRequest) {
       );
     }
 
-    // Link video to user (uses onConflictDoNothing internally)
-    linkVideoToUser(user.id, video.id);
+    // Check if already linked
+    const existingLink = await db.select()
+      .from(userVideos)
+      .where(and(
+        eq(userVideos.userId, user.id),
+        eq(userVideos.videoAnalysisId, video.id)
+      ))
+      .limit(1);
+
+    const alreadyLinked = existingLink.length > 0;
+
+    // Only link if not already linked
+    if (!alreadyLinked) {
+      await linkVideoToUser(user.id, video.id);
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Video successfully linked to user account'
+      alreadyLinked,
+      message: alreadyLinked
+        ? 'Video already in your library'
+        : 'Video successfully linked to your account'
     });
 
   } catch (error) {

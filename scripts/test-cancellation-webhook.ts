@@ -1,29 +1,30 @@
-import { createServiceRoleClient } from '../lib/supabase/admin';
-import { mapStripeSubscriptionToProfileUpdate } from '../lib/subscription-manager';
+import { db } from '../lib/db';
+import { users } from '../lib/db/schema';
+import { eq } from 'drizzle-orm';
 import type Stripe from 'stripe';
 
 async function testCancellationWebhook(subscriptionId: string) {
-  const supabase = createServiceRoleClient();
-
   console.log(`\n🧪 Testing cancellation webhook for subscription: ${subscriptionId}\n`);
 
   // Find the user
-  const { data: profile, error: findError } = await supabase
-    .from('profiles')
-    .select('id, email, subscription_tier, subscription_status, cancel_at_period_end')
-    .eq('stripe_subscription_id', subscriptionId)
-    .maybeSingle();
+  const [user] = await db.select({
+    id: users.id,
+    email: users.email,
+    tier: users.tier,
+    subscriptionStatus: users.subscriptionStatus,
+    cancelAtPeriodEnd: users.cancelAtPeriodEnd,
+  }).from(users).where(eq(users.stripeSubscriptionId, subscriptionId));
 
-  if (findError || !profile) {
-    console.error('❌ Could not find user with this subscription:', findError);
+  if (!user) {
+    console.error('❌ Could not find user with this subscription');
     return;
   }
 
-  console.log(`👤 Found user: ${profile.email || profile.id}`);
+  console.log(`👤 Found user: ${user.email || user.id}`);
   console.log('📊 Current state:');
-  console.log(`   Tier: ${profile.subscription_tier}`);
-  console.log(`   Status: ${profile.subscription_status}`);
-  console.log(`   Cancel at period end: ${profile.cancel_at_period_end}\n`);
+  console.log(`   Tier: ${user.tier}`);
+  console.log(`   Status: ${user.subscriptionStatus}`);
+  console.log(`   Cancel at period end: ${user.cancelAtPeriodEnd}\n`);
 
   // Simulate a Stripe subscription object with cancel_at_period_end = true
   const mockCancelledSubscription: Partial<Stripe.Subscription> = {
@@ -41,39 +42,37 @@ async function testCancellationWebhook(subscriptionId: string) {
   console.log(`     period_end: ${new Date(mockCancelledSubscription.current_period_end! * 1000).toISOString()}\n`);
 
   // Map to database update (same as webhook handler does)
-  const updatePayload = mapStripeSubscriptionToProfileUpdate(mockCancelledSubscription as Stripe.Subscription);
+  const updatePayload = {
+    subscriptionStatus: mockCancelledSubscription.status,
+    cancelAtPeriodEnd: mockCancelledSubscription.cancel_at_period_end ? 1 : 0,
+    subscriptionCurrentPeriodStart: mockCancelledSubscription.current_period_start,
+    subscriptionCurrentPeriodEnd: mockCancelledSubscription.current_period_end,
+  };
 
   console.log('📝 Update payload:', JSON.stringify(updatePayload, null, 2), '\n');
 
   // Apply the update
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update(updatePayload)
-    .eq('id', profile.id);
-
-  if (updateError) {
-    console.error('❌ Failed to update database:', updateError);
-    return;
-  }
+  await db.update(users).set(updatePayload).where(eq(users.id, user.id));
 
   console.log('✅ Database updated successfully!\n');
 
   // Verify the update
-  const { data: updated } = await supabase
-    .from('profiles')
-    .select('subscription_tier, subscription_status, cancel_at_period_end, subscription_current_period_end')
-    .eq('id', profile.id)
-    .single();
+  const [updatedUser] = await db.select({
+    tier: users.tier,
+    subscriptionStatus: users.subscriptionStatus,
+    cancelAtPeriodEnd: users.cancelAtPeriodEnd,
+    subscriptionCurrentPeriodEnd: users.subscriptionCurrentPeriodEnd,
+  }).from(users).where(eq(users.id, user.id));
 
   console.log('✅ New state in database:');
-  console.log(`   Tier: ${updated?.subscription_tier}`);
-  console.log(`   Status: ${updated?.subscription_status}`);
-  console.log(`   Cancel at period end: ${updated?.cancel_at_period_end}`);
-  console.log(`   Period end: ${updated?.subscription_current_period_end}`);
+  console.log(`   Tier: ${updatedUser?.tier}`);
+  console.log(`   Status: ${updatedUser?.subscriptionStatus}`);
+  console.log(`   Cancel at period end: ${updatedUser?.cancelAtPeriodEnd}`);
+  console.log(`   Period end: ${updatedUser?.subscriptionCurrentPeriodEnd}`);
 
   console.log('\n🎯 Expected UI behavior:');
-  if (updated?.cancel_at_period_end) {
-    const endDate = new Date(updated.subscription_current_period_end!);
+  if (updatedUser?.cancelAtPeriodEnd) {
+    const endDate = new Date(updatedUser.subscriptionCurrentPeriodEnd! * 1000);
     console.log(`   - Status should show: "Cancels on ${endDate.toLocaleDateString()}"`);
     console.log(`   - Warning alert should appear`);
     console.log(`   - AlertCircle icon should display`);

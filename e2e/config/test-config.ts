@@ -229,15 +229,6 @@ export const featureFlags = {
 };
 
 /**
- * Supabase configuration
- */
-export const supabaseConfig = {
-  url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-  serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-};
-
-/**
  * Get environment variable with default
  */
 export function getEnv(key: string, defaultValue: string = ''): string {

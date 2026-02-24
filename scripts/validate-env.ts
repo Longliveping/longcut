@@ -50,10 +50,8 @@ function validateRequiredEnvVars(): ValidationResult {
 
   // Required environment variables
   const required = {
-    // Supabase
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    // SQLite uses DATABASE_URL env var (optional, defaults to ./local.db)
+    // DATABASE_URL: process.env.DATABASE_URL,
 
     // Supadata (transcript fetching)
     SUPADATA_API_KEY: process.env.SUPADATA_API_KEY,
@@ -233,7 +231,7 @@ async function main() {
     console.log('\n📊 Environment Summary:');
     console.log(`  • Node Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`  • Stripe Mode: ${process.env.STRIPE_SECRET_KEY?.includes('_test_') ? 'TEST' : 'LIVE'}`);
-    console.log(`  • Supabase Project: ${process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/https:\/\/([^.]+)/)?.[1] || 'unknown'}`);
+    console.log(`  • Database: SQLite (${process.env.DATABASE_URL || './local.db'})`);
   }
 
   // Exit with appropriate code

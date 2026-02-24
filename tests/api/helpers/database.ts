@@ -1,11 +1,13 @@
 /**
  * Database Helper for API Testing
- * 
+ *
  * Provides utilities for managing test data in the database during API tests.
- * Includes functions for creating, cleaning up, and querying test data.
+ * Uses SQLite with Drizzle ORM.
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { db } from '@/lib/db';
+import { users, videoAnalyses, notes, userVideos } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 // ============================================================================
 // Types
@@ -17,82 +19,39 @@ export interface TestUser {
   password?: string;
   full_name?: string;
   avatar_url?: string;
-  subscription_tier?: 'free' | 'basic' | 'premium';
-  subscription_status?: string;
-  topup_credits?: number;
-  topic_generation_mode?: 'smart' | 'fast';
+  tier?: 'free' | 'basic' | 'premium';
+  subscriptionStatus?: string;
+  topupCredits?: number;
 }
 
 export interface TestVideoAnalysis {
   id?: string;
-  youtube_id: string;
+  youtubeId: string;
   title: string;
   author?: string;
   duration?: number;
-  thumbnail_url?: string;
+  thumbnailUrl?: string;
   transcript?: any;
   topics?: any;
   summary?: any;
-  suggested_questions?: any;
-  model_used?: string;
+  suggestedQuestions?: any;
 }
 
 export interface TestUserNote {
   id?: string;
-  user_id: string;
-  video_id: string;
+  userId: string;
+  videoId: string;
   source: 'chat' | 'takeaways' | 'transcript' | 'custom';
-  source_id?: string;
-  note_text: string;
+  sourceId?: string;
+  text: string;
   metadata?: Record<string, any>;
 }
 
 export interface TestUserVideo {
   id?: string;
-  user_id: string;
-  video_id: string;
-  is_favorite?: boolean;
-  notes?: string;
-  accessed_at?: string;
-}
-
-// ============================================================================
-// Client Management
-// ============================================================================
-
-let supabaseClient: ReturnType<typeof createClient> | null = null;
-
-/**
- * Get or create a Supabase client for testing
- * Uses service role key for bypassing RLS in tests
- */
-export function getTestDbClient() {
-  if (!supabaseClient) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !serviceRoleKey) {
-      throw new Error(
-        'Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables'
-      );
-    }
-
-    supabaseClient = createClient(supabaseUrl, serviceRoleKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    }) as any;
-  }
-
-  return supabaseClient;
-}
-
-/**
- * Reset the client instance (useful between test suites)
- */
-export function resetTestDbClient() {
-  supabaseClient = null;
+  userId: string;
+  videoAnalysisId: string;
+  isFavorite?: boolean;
 }
 
 // ============================================================================
@@ -101,30 +60,24 @@ export function resetTestDbClient() {
 
 /**
  * Create a test user in the database
- * Note: This creates the profile row, not the auth user
  */
 export async function createTestUser(overrides: Partial<TestUser> = {}): Promise<TestUser> {
-  const client = getTestDbClient();
   const userId = overrides.id || crypto.randomUUID();
-  
-  const testUser: Omit<TestUser, 'password'> = {
+
+  const testUser = {
     id: userId,
     email: overrides.email || `test-${userId.slice(0, 8)}@example.com`,
-    full_name: overrides.full_name || 'Test User',
-    avatar_url: overrides.avatar_url || undefined,
-    subscription_tier: overrides.subscription_tier || 'free',
-    subscription_status: overrides.subscription_status || undefined,
-    topup_credits: overrides.topup_credits ?? 0,
-    topic_generation_mode: overrides.topic_generation_mode || 'smart',
+    passwordHash: 'fake-hash-for-testing',
+    name: overrides.full_name || 'Test User',
+    image: overrides.avatar_url || null,
+    tier: overrides.tier || 'free',
+    subscriptionStatus: overrides.subscriptionStatus || null,
+    topupCredits: overrides.topupCredits ?? 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
-  const { error } = await client!
-    .from('profiles')
-    .insert(testUser as any);
-
-  if (error) {
-    throw new Error(`Failed to create test user: ${error.message}`);
-  }
+  await db.insert(users).values(testUser as any);
 
   return testUser;
 }
@@ -135,30 +88,24 @@ export async function createTestUser(overrides: Partial<TestUser> = {}): Promise
 export async function createTestVideoAnalysis(
   data: TestVideoAnalysis
 ): Promise<TestVideoAnalysis & { id: string }> {
-  const client = getTestDbClient();
   const videoId = data.id || crypto.randomUUID();
 
   const videoAnalysis = {
     id: videoId,
-    youtube_id: data.youtube_id,
+    youtubeId: data.youtubeId,
     title: data.title,
     author: data.author || 'Test Author',
     duration: data.duration || 600,
-    thumbnail_url: data.thumbnail_url || `https://example.com/thumb/${data.youtube_id}.jpg`,
-    transcript: data.transcript || [],
+    thumbnailUrl: data.thumbnailUrl || `https://example.com/thumb/${data.youtubeId}.jpg`,
+    transcript: data.transcript || null,
     topics: data.topics || null,
     summary: data.summary || null,
-    suggested_questions: data.suggested_questions || null,
-    model_used: data.model_used || 'gemini-2.5-flash',
+    suggestedQuestions: data.suggestedQuestions || null,
+    createdAt: Math.floor(Date.now() / 1000),
+    updatedAt: Math.floor(Date.now() / 1000),
   };
 
-  const { error } = await client!
-    .from('video_analyses')
-    .insert(videoAnalysis as any);
-
-  if (error) {
-    throw new Error(`Failed to create test video analysis: ${error.message}`);
-  }
+  await db.insert(videoAnalyses).values(videoAnalysis as any);
 
   return { ...data, id: videoId };
 }
@@ -169,26 +116,22 @@ export async function createTestVideoAnalysis(
 export async function createTestUserNote(
   data: TestUserNote
 ): Promise<TestUserNote & { id: string }> {
-  const client = getTestDbClient();
   const noteId = data.id || crypto.randomUUID();
+  const now = Math.floor(Date.now() / 1000);
 
   const userNote = {
     id: noteId,
-    user_id: data.user_id,
-    video_id: data.video_id,
+    userId: data.userId,
+    videoId: data.videoId,
     source: data.source,
-    source_id: data.source_id || null,
-    note_text: data.note_text,
+    sourceId: data.sourceId || null,
+    text: data.text,
     metadata: data.metadata || null,
+    createdAt: now,
+    updatedAt: now,
   };
 
-  const { error } = await client!
-    .from('user_notes')
-    .insert(userNote as any);
-
-  if (error) {
-    throw new Error(`Failed to create test user note: ${error.message}`);
-  }
+  await db.insert(notes).values(userNote as any);
 
   return { ...data, id: noteId };
 }
@@ -199,25 +142,18 @@ export async function createTestUserNote(
 export async function createTestUserVideo(
   data: TestUserVideo
 ): Promise<TestUserVideo & { id: string }> {
-  const client = getTestDbClient();
   const userVideoId = data.id || crypto.randomUUID();
+  const now = Math.floor(Date.now() / 1000);
 
   const userVideo = {
     id: userVideoId,
-    user_id: data.user_id,
-    video_id: data.video_id,
-    is_favorite: data.is_favorite ?? false,
-    notes: data.notes || null,
-    accessed_at: data.accessed_at || new Date().toISOString(),
+    userId: data.userId,
+    videoAnalysisId: data.videoAnalysisId,
+    isFavorite: data.isFavorite ?? false,
+    createdAt: now,
   };
 
-  const { error } = await client!
-    .from('user_videos')
-    .insert(userVideo as any);
-
-  if (error) {
-    throw new Error(`Failed to create test user video: ${error.message}`);
-  }
+  await db.insert(userVideos).values(userVideo as any);
 
   return { ...data, id: userVideoId };
 }
@@ -227,30 +163,30 @@ export async function createTestUserVideo(
  */
 export async function createTestScenario(options: {
   user?: Partial<TestUser>;
-  video?: Partial<TestVideoAnalysis> & { youtube_id: string; title: string };
+  video?: Partial<TestVideoAnalysis> & { youtubeId: string; title: string };
   isFavorite?: boolean;
   hasNotes?: boolean;
 }) {
   const user = await createTestUser(options.user || {});
   const video = await createTestVideoAnalysis({
-    youtube_id: options.video?.youtube_id || 'test-youtube-id',
+    youtubeId: options.video?.youtubeId || 'test-youtube-id',
     title: options.video?.title || 'Test Video',
     ...options.video,
   });
 
   const userVideo = await createTestUserVideo({
-    user_id: user.id,
-    video_id: video.id!,
-    is_favorite: options.isFavorite || false,
+    userId: user.id,
+    videoAnalysisId: video.id!,
+    isFavorite: options.isFavorite || false,
   });
 
   let note: TestUserNote & { id: string } | null = null;
   if (options.hasNotes) {
     note = await createTestUserNote({
-      user_id: user.id,
-      video_id: video.id!,
+      userId: user.id,
+      videoId: video.id!,
       source: 'custom',
-      note_text: 'Test note for this video',
+      text: 'Test note for this video',
     });
   }
 
@@ -265,79 +201,41 @@ export async function createTestScenario(options: {
  * Delete a test user by ID
  */
 export async function deleteTestUser(userId: string): Promise<void> {
-  const client = getTestDbClient();
-
-  const { error } = await client!
-    .from('profiles')
-    .delete()
-    .eq('id', userId);
-
-  if (error) {
-    throw new Error(`Failed to delete test user: ${error.message}`);
-  }
+  await db.delete(users).where(eq(users.id, userId));
 }
 
 /**
  * Delete a test video analysis by ID
  */
 export async function deleteTestVideoAnalysis(videoId: string): Promise<void> {
-  const client = getTestDbClient();
-
-  const { error } = await client!
-    .from('video_analyses')
-    .delete()
-    .eq('id', videoId);
-
-  if (error) {
-    throw new Error(`Failed to delete test video analysis: ${error.message}`);
-  }
+  await db.delete(videoAnalyses).where(eq(videoAnalyses.id, videoId));
 }
 
 /**
  * Delete a test user note by ID
  */
 export async function deleteTestUserNote(noteId: string): Promise<void> {
-  const client = getTestDbClient();
-
-  const { error } = await client!
-    .from('user_notes')
-    .delete()
-    .eq('id', noteId);
-
-  if (error) {
-    throw new Error(`Failed to delete test user note: ${error.message}`);
-  }
+  await db.delete(notes).where(eq(notes.id, noteId));
 }
 
 /**
  * Delete a test user video by ID
  */
 export async function deleteTestUserVideo(userVideoId: string): Promise<void> {
-  const client = getTestDbClient();
-
-  const { error } = await client!
-    .from('user_videos')
-    .delete()
-    .eq('id', userVideoId);
-
-  if (error) {
-    throw new Error(`Failed to delete test user video: ${error.message}`);
-  }
+  await db.delete(userVideos).where(eq(userVideos.id, userVideoId));
 }
 
 /**
  * Delete all test data created during a test run
- * Identifies test data by email pattern or specific IDs
  */
 export async function cleanupTestData(userIds: string[] = []): Promise<void> {
-  const client = getTestDbClient();
   const errors: string[] = [];
 
   // Delete user relationships first (due to foreign key constraints)
   for (const userId of userIds) {
     try {
-      await client!.from('user_notes').delete().eq('user_id', userId);
-      await client!.from('user_videos').delete().eq('user_id', userId);
+      await db.delete(notes).where(eq(notes.userId, userId));
+      await db.delete(userVideos).where(eq(userVideos.userId, userId));
     } catch (e) {
       errors.push(`Failed to delete user relationships for ${userId}: ${e}`);
     }
@@ -346,7 +244,7 @@ export async function cleanupTestData(userIds: string[] = []): Promise<void> {
   // Delete users
   for (const userId of userIds) {
     try {
-      await client!.from('profiles').delete().eq('id', userId);
+      await db.delete(users).where(eq(users.id, userId));
     } catch (e) {
       errors.push(`Failed to delete user ${userId}: ${e}`);
     }
@@ -359,24 +257,15 @@ export async function cleanupTestData(userIds: string[] = []): Promise<void> {
 
 /**
  * Clean up all data with test email patterns
- * Useful for cleaning up orphaned test data
  */
 export async function cleanupTestUsersByEmailPattern(
   pattern: string = '%@example.com'
 ): Promise<number> {
-  const client = getTestDbClient();
+  // For SQLite, we need to fetch matching users first
+  const allUsers = await db.select().from(users);
+  const matchingUsers = allUsers.filter(u => u.email.includes('@example.com'));
 
-  // First, get all matching user IDs
-  const { data: users, error } = await client!
-    .from('profiles')
-    .select('id')
-    .like('email', pattern);
-
-  if (error) {
-    throw new Error(`Failed to query test users: ${error.message}`);
-  }
-
-  const userIds = users?.map((u: any) => u.id) || [];
+  const userIds = matchingUsers.map(u => u.id);
 
   // Clean up all related data
   await cleanupTestData(userIds);
@@ -392,22 +281,8 @@ export async function cleanupTestUsersByEmailPattern(
  * Get a test user by ID
  */
 export async function getTestUser(userId: string): Promise<TestUser | null> {
-  const client = getTestDbClient();
-
-  const { data, error } = await client!
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null; // Not found
-    }
-    throw new Error(`Failed to get test user: ${error.message}`);
-  }
-
-  return data as TestUser;
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
+  return user || null;
 }
 
 /**
@@ -416,22 +291,8 @@ export async function getTestUser(userId: string): Promise<TestUser | null> {
 export async function getTestVideoAnalysis(
   videoId: string
 ): Promise<TestVideoAnalysis & { id: string } | null> {
-  const client = getTestDbClient();
-
-  const { data, error } = await client!
-    .from('video_analyses')
-    .select('*')
-    .eq('id', videoId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null; // Not found
-    }
-    throw new Error(`Failed to get test video analysis: ${error.message}`);
-  }
-
-  return data as TestVideoAnalysis & { id: string };
+  const [video] = await db.select().from(videoAnalyses).where(eq(videoAnalyses.id, videoId));
+  return video || null;
 }
 
 /**
@@ -440,75 +301,46 @@ export async function getTestVideoAnalysis(
 export async function getTestVideoAnalysisByYoutubeId(
   youtubeId: string
 ): Promise<TestVideoAnalysis & { id: string } | null> {
-  const client = getTestDbClient();
-
-  const { data, error } = await client!
-    .from('video_analyses')
-    .select('*')
-    .eq('youtube_id', youtubeId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null; // Not found
-    }
-    throw new Error(`Failed to get test video analysis: ${error.message}`);
-  }
-
-  return data as TestVideoAnalysis & { id: string };
+  const [video] = await db.select().from(videoAnalyses).where(eq(videoAnalyses.youtubeId, youtubeId));
+  return video || null;
 }
 
 /**
  * Get all notes for a test user
  */
 export async function getTestUserNotes(userId: string): Promise<TestUserNote[]> {
-  const client = getTestDbClient();
-
-  const { data, error } = await client!
-    .from('user_notes')
-    .select('*')
-    .eq('user_id', userId);
-
-  if (error) {
-    throw new Error(`Failed to get test user notes: ${error.message}`);
-  }
-
-  return (data as TestUserNote[]) || [];
+  return await db.select().from(notes).where(eq(notes.userId, userId));
 }
 
 /**
  * Get all videos for a test user
  */
 export async function getTestUserVideos(userId: string): Promise<TestUserVideo[]> {
-  const client = getTestDbClient();
-
-  const { data, error } = await client!
-    .from('user_videos')
-    .select('*')
-    .eq('user_id', userId);
-
-  if (error) {
-    throw new Error(`Failed to get test user videos: ${error.message}`);
-  }
-
-  return (data as TestUserVideo[]) || [];
+  return await db.select().from(userVideos).where(eq(userVideos.userId, userId));
 }
 
 /**
  * Count records in a table
  */
 export async function countTableRecords(tableName: string): Promise<number> {
-  const client = getTestDbClient();
+  let result = 0;
 
-  const { count, error } = await client!
-    .from(tableName)
-    .select('*', { count: 'exact', head: true });
-
-  if (error) {
-    throw new Error(`Failed to count ${tableName} records: ${error.message}`);
+  switch (tableName) {
+    case 'users':
+      result = (await db.select().from(users)).length;
+      break;
+    case 'video_analyses':
+      result = (await db.select().from(videoAnalyses)).length;
+      break;
+    case 'notes':
+      result = (await db.select().from(notes)).length;
+      break;
+    case 'user_videos':
+      result = (await db.select().from(userVideos)).length;
+      break;
   }
 
-  return count || 0;
+  return result;
 }
 
 // ============================================================================
@@ -520,9 +352,8 @@ export async function countTableRecords(tableName: string): Promise<number> {
  */
 export async function isDatabaseAccessible(): Promise<boolean> {
   try {
-    const client = getTestDbClient();
-    const { error } = await client!.from('profiles').select('id').limit(1);
-    return !error;
+    await db.select().from(users).limit(1);
+    return true;
   } catch {
     return false;
   }
@@ -530,55 +361,34 @@ export async function isDatabaseAccessible(): Promise<boolean> {
 
 /**
  * Truncate all test tables (use with caution!)
- * This is faster than deleting individual records but more dangerous
  */
 export async function truncateTestTables(): Promise<void> {
-  const client = getTestDbClient();
-  const tables = [
-    'user_notes',
-    'user_videos',
-    'video_analyses',
-    'video_generations',
-    'rate_limits',
-  ];
+  // SQLite doesn't have TRUNCATE, use DELETE instead
+  await db.delete(notes).run();
+  await db.delete(userVideos).run();
+  await db.delete(videoAnalyses).run();
+  await db.delete(users).run();
+}
 
-  for (const table of tables) {
-    const { error } = await (client as any).rpc('truncate_table', {
-      table_name: table 
-    } as any);
-    if (error) {
-      console.warn(`Failed to truncate ${table}: ${error.message}`);
-    }
+// ============================================================================
+// Client Management (kept for compatibility)
+// ============================================================================
+
+let dbClient: typeof db | null = null;
+
+/**
+ * Get the Drizzle database client for testing
+ */
+export function getTestDbClient() {
+  if (!dbClient) {
+    dbClient = db;
   }
+  return dbClient;
 }
 
 /**
- * Begin a database transaction for isolated testing
- * Note: This requires the database to have transaction support enabled
+ * Reset the client instance (useful between test suites)
  */
-export async function withTestTransaction<T>(
-  callback: () => Promise<T>
-): Promise<T> {
-  const client = getTestDbClient();
-  
-  try {
-    // Begin transaction
-    await client!.rpc('begin_transaction');
-    
-    // Execute callback
-    const result = await callback();
-    
-    // Rollback transaction (clean up test data)
-    await client!.rpc('rollback_transaction');
-    
-    return result;
-  } catch (error) {
-    // Ensure rollback on error
-    try {
-      await client!.rpc('rollback_transaction');
-    } catch {
-      // Ignore rollback errors
-    }
-    throw error;
-  }
+export function resetTestDbClient() {
+  dbClient = null;
 }

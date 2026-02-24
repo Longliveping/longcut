@@ -1,10 +1,10 @@
 import { getStripeClient } from '../lib/stripe-client';
-import { createServiceRoleClient } from '../lib/supabase/admin';
-import { mapStripeSubscriptionToProfileUpdate } from '../lib/subscription-manager';
+import { db } from '../lib/db';
+import { users } from '../lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 async function syncSubscriptionFromStripe(subscriptionId: string) {
   const stripe = getStripeClient();
-  const supabase = createServiceRoleClient();
 
   console.log(`\nFetching subscription ${subscriptionId} from Stripe...`);
 
@@ -19,54 +19,54 @@ async function syncSubscriptionFromStripe(subscriptionId: string) {
     console.log(`  Current period end: ${subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : 'N/A'}`);
 
     // Find user by subscription ID
-    const { data: profile, error: findError } = await supabase
-      .from('profiles')
-      .select('id, email, subscription_tier, subscription_status, cancel_at_period_end')
-      .eq('stripe_subscription_id', subscriptionId)
-      .maybeSingle();
+    const [user] = await db.select({
+      id: users.id,
+      email: users.email,
+      tier: users.tier,
+      subscriptionStatus: users.subscriptionStatus,
+      cancelAtPeriodEnd: users.cancelAtPeriodEnd,
+    }).from(users).where(eq(users.stripeSubscriptionId, subscriptionId));
 
-    if (findError || !profile) {
-      console.error('❌ Could not find user with this subscription:', findError);
+    if (!user) {
+      console.error('❌ Could not find user with this subscription');
       return;
     }
 
-    console.log(`\n👤 Found user: ${profile.email || profile.id}`);
+    console.log(`\n👤 Found user: ${user.email || user.id}`);
     console.log('  Current DB state:');
-    console.log(`    Tier: ${profile.subscription_tier}`);
-    console.log(`    Status: ${profile.subscription_status}`);
-    console.log(`    Cancel at period end: ${profile.cancel_at_period_end}`);
+    console.log(`    Tier: ${user.tier}`);
+    console.log(`    Status: ${user.subscriptionStatus}`);
+    console.log(`    Cancel at period end: ${user.cancelAtPeriodEnd}`);
 
     // Map Stripe data to database update
-    const updatePayload = mapStripeSubscriptionToProfileUpdate(subscription);
+    const updatePayload = {
+      subscriptionStatus: subscription.status,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end ? 1 : 0,
+      subscriptionCurrentPeriodStart: subscription.current_period_start,
+      subscriptionCurrentPeriodEnd: subscription.current_period_end,
+    };
 
     console.log('\n🔄 Updating database with Stripe data...');
     console.log('  Update payload:', JSON.stringify(updatePayload, null, 2));
 
     // Update the database
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update(updatePayload)
-      .eq('id', profile.id);
-
-    if (updateError) {
-      console.error('❌ Failed to update database:', updateError);
-      return;
-    }
+    await db.update(users).set(updatePayload).where(eq(users.id, user.id));
 
     console.log('✅ Successfully synced subscription from Stripe to database!');
 
     // Verify the update
-    const { data: updated } = await supabase
-      .from('profiles')
-      .select('subscription_tier, subscription_status, cancel_at_period_end, subscription_current_period_end')
-      .eq('id', profile.id)
-      .single();
+    const [updatedUser] = await db.select({
+      tier: users.tier,
+      subscriptionStatus: users.subscriptionStatus,
+      cancelAtPeriodEnd: users.cancelAtPeriodEnd,
+      subscriptionCurrentPeriodEnd: users.subscriptionCurrentPeriodEnd,
+    }).from(users).where(eq(users.id, user.id));
 
     console.log('\n✅ Updated DB state:');
-    console.log(`  Tier: ${updated?.subscription_tier}`);
-    console.log(`  Status: ${updated?.subscription_status}`);
-    console.log(`  Cancel at period end: ${updated?.cancel_at_period_end}`);
-    console.log(`  Period end: ${updated?.subscription_current_period_end}`);
+    console.log(`  Tier: ${updatedUser?.tier}`);
+    console.log(`  Status: ${updatedUser?.subscriptionStatus}`);
+    console.log(`  Cancel at period end: ${updatedUser?.cancelAtPeriodEnd}`);
+    console.log(`  Period end: ${updatedUser?.subscriptionCurrentPeriodEnd}`);
 
   } catch (error) {
     console.error('❌ Error syncing subscription:', error);

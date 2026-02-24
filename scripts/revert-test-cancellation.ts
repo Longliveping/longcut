@@ -1,10 +1,10 @@
 import { getStripeClient } from '../lib/stripe-client';
-import { createServiceRoleClient } from '../lib/supabase/admin';
-import { mapStripeSubscriptionToProfileUpdate } from '../lib/subscription-manager';
+import { db } from '../lib/db';
+import { users } from '../lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 async function revertTestCancellation(subscriptionId: string) {
   const stripe = getStripeClient();
-  const supabase = createServiceRoleClient();
 
   console.log(`\n🔄 Reverting test cancellation for subscription: ${subscriptionId}\n`);
 
@@ -16,29 +16,25 @@ async function revertTestCancellation(subscriptionId: string) {
   console.log(`   cancel_at_period_end: ${subscription.cancel_at_period_end}\n`);
 
   // Find the user
-  const { data: profile, error: findError } = await supabase
-    .from('profiles')
-    .select('id, email')
-    .eq('stripe_subscription_id', subscriptionId)
-    .maybeSingle();
+  const [user] = await db.select({
+    id: users.id,
+    email: users.email,
+  }).from(users).where(eq(users.stripeSubscriptionId, subscriptionId));
 
-  if (findError || !profile) {
+  if (!user) {
     console.error('❌ Could not find user');
     return;
   }
 
   // Sync with real Stripe data
-  const updatePayload = mapStripeSubscriptionToProfileUpdate(subscription);
+  const updatePayload = {
+    subscriptionStatus: subscription.status,
+    cancelAtPeriodEnd: subscription.cancel_at_period_end ? 1 : 0,
+    subscriptionCurrentPeriodStart: subscription.current_period_start,
+    subscriptionCurrentPeriodEnd: subscription.current_period_end,
+  };
 
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update(updatePayload)
-    .eq('id', profile.id);
-
-  if (updateError) {
-    console.error('❌ Failed to update:', updateError);
-    return;
-  }
+  await db.update(users).set(updatePayload).where(eq(users.id, user.id));
 
   console.log('✅ Database synced with actual Stripe state\n');
 }

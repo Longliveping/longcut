@@ -43,24 +43,15 @@ try {
 }
 
 // Import dependencies after environment is loaded
-import { createServiceRoleClient } from '../lib/supabase/admin';
+import { db } from '../lib/db';
+import { users } from '../lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 interface GrantProOptions {
   email: string;
   expiresAt?: Date;
   bonusCredits?: number;
   dryRun?: boolean;
-}
-
-interface Profile {
-  id: string;
-  email: string;
-  subscription_tier: string | null;
-  subscription_status: string | null;
-  subscription_current_period_end: string | null;
-  topup_credits: number;
-  stripe_customer_id: string | null;
-  stripe_subscription_id: string | null;
 }
 
 function parseArgs(): GrantProOptions | null {
@@ -142,59 +133,54 @@ Examples:
   `);
 }
 
-function displayProfile(profile: Profile, label: string) {
+function displayUser(user: typeof users.$inferSelect, label: string) {
   console.log(`\n${label}:`);
-  console.log(`  Email: ${profile.email}`);
-  console.log(`  Tier: ${profile.subscription_tier || 'none'}`);
-  console.log(`  Status: ${profile.subscription_status || 'none'}`);
-  console.log(`  Period End: ${profile.subscription_current_period_end || 'none'}`);
-  console.log(`  Top-up Credits: ${profile.topup_credits}`);
-  console.log(`  Stripe Customer: ${profile.stripe_customer_id || 'none'}`);
-  console.log(`  Stripe Subscription: ${profile.stripe_subscription_id || 'none'}`);
+  console.log(`  Email: ${user.email}`);
+  console.log(`  Tier: ${user.tier || 'none'}`);
+  console.log(`  Status: ${user.subscriptionStatus || 'none'}`);
+  console.log(`  Period End: ${user.subscriptionCurrentPeriodEnd || 'none'}`);
+  console.log(`  Top-up Credits: ${user.topupCredits}`);
+  console.log(`  Stripe Customer: ${user.stripeCustomerId || 'none'}`);
+  console.log(`  Stripe Subscription: ${user.stripeSubscriptionId || 'none'}`);
 }
 
 async function grantProAccess(options: GrantProOptions): Promise<void> {
-  const supabase = createServiceRoleClient();
   const periodEnd = options.expiresAt || new Date('2099-12-31');
-  const periodStart = new Date();
+  const periodStart = Math.floor(Date.now() / 1000);
 
   console.log(`\n🔍 Looking up user: ${options.email}`);
 
-  // Fetch current profile
-  const { data: currentProfile, error: fetchError } = await supabase
-    .from('profiles')
-    .select('id, email, subscription_tier, subscription_status, subscription_current_period_end, topup_credits, stripe_customer_id, stripe_subscription_id')
-    .eq('email', options.email)
-    .single();
+  // Fetch current user
+  const [user] = await db.select().from(users).where(eq(users.email, options.email));
 
-  if (fetchError || !currentProfile) {
+  if (!user) {
     console.error(`❌ Error: User not found with email: ${options.email}`);
-    console.error('   Make sure the user has logged in at least once to create a profile.');
+    console.error('   Make sure the user has logged in at least once.');
     return;
   }
 
-  displayProfile(currentProfile as Profile, '📋 Current Profile');
+  displayUser(user, '📋 Current User');
 
   // Prepare updates
-  const updates: any = {
-    subscription_tier: 'pro',
-    subscription_status: 'active',
-    subscription_current_period_start: periodStart.toISOString(),
-    subscription_current_period_end: periodEnd.toISOString(),
-    cancel_at_period_end: false,
+  const updates: Partial<typeof users.$inferInsert> = {
+    tier: 'pro',
+    subscriptionStatus: 'active',
+    subscriptionCurrentPeriodStart: periodStart,
+    subscriptionCurrentPeriodEnd: Math.floor(periodEnd.getTime() / 1000),
+    cancelAtPeriodEnd: 0,
   };
 
   if (options.bonusCredits && options.bonusCredits > 0) {
-    updates.topup_credits = (currentProfile.topup_credits || 0) + options.bonusCredits;
+    updates.topupCredits = (user.topupCredits || 0) + options.bonusCredits;
   }
 
   console.log(`\n📝 Planned Changes:`);
-  console.log(`  Subscription Tier: ${currentProfile.subscription_tier || 'none'} → pro`);
-  console.log(`  Subscription Status: ${currentProfile.subscription_status || 'none'} → active`);
-  console.log(`  Period Start: ${periodStart.toISOString()}`);
-  console.log(`  Period End: ${currentProfile.subscription_current_period_end || 'none'} → ${periodEnd.toISOString()}`);
+  console.log(`  Subscription Tier: ${user.tier || 'none'} → pro`);
+  console.log(`  Subscription Status: ${user.subscriptionStatus || 'none'} → active`);
+  console.log(`  Period Start: ${new Date(periodStart * 1000).toISOString()}`);
+  console.log(`  Period End: ${user.subscriptionCurrentPeriodEnd ? new Date(user.subscriptionCurrentPeriodEnd * 1000).toISOString() : 'none'} → ${periodEnd.toISOString()}`);
   if (options.bonusCredits && options.bonusCredits > 0) {
-    console.log(`  Top-up Credits: ${currentProfile.topup_credits || 0} → ${updates.topup_credits} (+${options.bonusCredits})`);
+    console.log(`  Top-up Credits: ${user.topupCredits || 0} → ${updates.topupCredits} (+${options.bonusCredits})`);
   }
 
   if (options.dryRun) {
@@ -204,19 +190,13 @@ async function grantProAccess(options: GrantProOptions): Promise<void> {
 
   // Execute update
   console.log(`\n⚙️  Applying changes...`);
-  const { data: updatedProfile, error: updateError } = await supabase
-    .from('profiles')
-    .update(updates)
-    .eq('id', currentProfile.id)
-    .select('id, email, subscription_tier, subscription_status, subscription_current_period_end, topup_credits, stripe_customer_id, stripe_subscription_id')
-    .single();
+  const [updatedUser] = await db
+    .update(users)
+    .set(updates)
+    .where(eq(users.id, user.id))
+    .returning();
 
-  if (updateError) {
-    console.error(`❌ Error updating profile:`, updateError);
-    return;
-  }
-
-  displayProfile(updatedProfile as Profile, '✅ Updated Profile');
+  displayUser(updatedUser, '✅ Updated User');
 
   console.log(`\n🎉 Successfully granted Pro access to ${options.email}`);
   if (periodEnd.getFullYear() === 2099) {

@@ -41,20 +41,14 @@ try {
 }
 
 // Import dependencies after environment is loaded
-import { createServiceRoleClient } from '../lib/supabase/admin';
+import { db } from '../lib/db';
+import { users } from '../lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 interface AddCreditsOptions {
   email: string;
   credits: number;
   dryRun?: boolean;
-}
-
-interface Profile {
-  id: string;
-  email: string;
-  subscription_tier: string | null;
-  subscription_status: string | null;
-  topup_credits: number;
 }
 
 function parseArgs(): AddCreditsOptions | null {
@@ -129,36 +123,29 @@ Examples:
   `);
 }
 
-function displayProfile(profile: Profile, label: string) {
+function displayProfile(user: typeof users.$inferSelect, label: string) {
   console.log(`\n${label}:`);
-  console.log(`  Email: ${profile.email}`);
-  console.log(`  Tier: ${profile.subscription_tier || 'none'}`);
-  console.log(`  Status: ${profile.subscription_status || 'none'}`);
-  console.log(`  Top-up Credits: ${profile.topup_credits}`);
+  console.log(`  Email: ${user.email}`);
+  console.log(`  Tier: ${user.tier || 'none'}`);
+  console.log(`  Status: ${user.subscriptionStatus || 'none'}`);
+  console.log(`  Top-up Credits: ${user.topupCredits}`);
 }
 
 async function addCredits(options: AddCreditsOptions): Promise<void> {
-  const supabase = createServiceRoleClient();
-
   console.log(`\n🔍 Looking up user: ${options.email}`);
 
-  // Fetch current profile
-  const { data: currentProfile, error: fetchError } = await supabase
-    .from('profiles')
-    .select('id, email, subscription_tier, subscription_status, topup_credits')
-    .eq('email', options.email)
-    .single();
+  // Fetch current user
+  const [user] = await db.select().from(users).where(eq(users.email, options.email));
 
-  if (fetchError || !currentProfile) {
+  if (!user) {
     console.error(`❌ Error: User not found with email: ${options.email}`);
-    console.error('   Make sure the user has logged in at least once to create a profile.');
+    console.error('   Make sure the user has logged in at least once.');
     return;
   }
 
-  const profile = currentProfile as Profile;
-  displayProfile(profile, '📋 Current Profile');
+  displayProfile(user, '📋 Current User');
 
-  const currentCredits = profile.topup_credits || 0;
+  const currentCredits = user.topupCredits || 0;
   const newCredits = currentCredits + options.credits;
 
   console.log(`\n📝 Planned Changes:`);
@@ -172,19 +159,13 @@ async function addCredits(options: AddCreditsOptions): Promise<void> {
 
   // Execute update
   console.log(`\n⚙️  Applying changes...`);
-  const { data: updatedProfile, error: updateError } = await supabase
-    .from('profiles')
-    .update({ topup_credits: newCredits })
-    .eq('id', profile.id)
-    .select('id, email, subscription_tier, subscription_status, topup_credits')
-    .single();
+  const [updatedUser] = await db
+    .update(users)
+    .set({ topupCredits: newCredits })
+    .where(eq(users.id, user.id))
+    .returning();
 
-  if (updateError) {
-    console.error(`❌ Error updating profile:`, updateError);
-    return;
-  }
-
-  displayProfile(updatedProfile as Profile, '✅ Updated Profile');
+  displayProfile(updatedUser, '✅ Updated User');
 
   console.log(`\n🎉 Successfully added ${options.credits} credits to ${options.email}`);
 }

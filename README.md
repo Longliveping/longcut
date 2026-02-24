@@ -4,7 +4,7 @@ LongCut turns long-form YouTube videos into a structured learning workspace. Pas
 
 ## Overview
 
-The project is a Next.js 15 + React 19 application that wraps xAI’s Grok 4 Fast models (with optional Gemini adapters) and Supadata transcripts with a polished UX. Supabase provides authentication, persistence, rate limiting, and profile preferences. The experience is optimized for fast iteration using Turbopack, Tailwind CSS v4, and shadcn/ui components.
+The project is a Next.js 15 + React 19 application that wraps xAI’s Grok 4 Fast models (with optional Gemini adapters) and Supadata transcripts with a polished UX. SQLite with Drizzle ORM provides authentication (via Lucia), persistence, rate limiting, and profile preferences. The experience is optimized for fast iteration using Turbopack, Tailwind CSS v4, and shadcn/ui components.
 
 ## Feature Highlights
 
@@ -13,9 +13,9 @@ The project is a Next.js 15 + React 19 application that wraps xAI’s Grok 4 Fas
 - AI chat grounded in the transcript with structured JSON responses, timestamp citations, and fallbacks when the provider rate-limits.
 - Transcript viewer that stays in sync with the YouTube player; click any sentence to jump or capture the quote.
 - Personal notes workspace with transcript, chat, and takeaway sources plus an `/all-notes` dashboard for cross-video review.
-- Authenticated library pages for saved analyses, favorites, generation limits, and Supabase-backed profile preferences.
+- Authenticated library pages for saved analyses, favorites, generation limits, and profile preferences.
 - Aggressive caching of previous analyses, background refresh tasks, and rate limits for anonymous vs. signed-in users.
-- Security middleware that enforces CSP headers, CSRF protection, body-size caps, and Supabase-backed rate limiting.
+- Security middleware that enforces CSP headers, CSRF protection, body-size caps, and SQLite-backed rate limiting.
 
 ## Star History
 
@@ -27,8 +27,8 @@ The project is a Next.js 15 + React 19 application that wraps xAI’s Grok 4 Fas
 - Backend runtime: Next.js serverless route handlers with `withSecurity` middleware for CSRF, input validation (Zod), and rate caps.
 - AI pipeline: `lib/ai-processing.ts` and `lib/ai-client.ts` orchestrate provider-agnostic prompts, structured output schemas, fallback handling, and transcript chunking via `lib/ai-providers/`.
 - Transcript & metadata: Supadata API delivers transcripts; lightweight YouTube oEmbed calls pull thumbnails and titles.
-- Persistence: Supabase stores `video_analyses`, `user_videos` (history + favorites), `user_notes`, `profiles` (topic generation mode, profile data), and `rate_limits`.
-- Authentication: Supabase Auth with session refresh in `middleware.ts`; `AuthModal` drives sign-up prompts when limits are hit.
+- Persistence: SQLite stores `video_analyses`, `user_videos` (history + favorites), `notes`, `users`, and `rate_limits`.
+- Authentication: Lucia auth with session management; `AuthModal` drives sign-up prompts when limits are hit.
 - Security: Global middleware adds CSP/HSTS headers, CSRF tokens for stateful requests, hashed IP identifiers for anonymous rate limiting, and request body size guards.
 
 ## Application Pages
@@ -68,20 +68,18 @@ The project is a Next.js 15 + React 19 application that wraps xAI’s Grok 4 Fas
 │   ├── youtube-player.tsx      # Player wrapper with shared playback state
 │   └── ui/                     # Reusable shadcn/ui primitives
 ├── contexts/
-│   └── auth-context.tsx        # Supabase auth provider
+│   └── auth-context.tsx        # Authentication context (Lucia auth)
 ├── lib/
 │   ├── ai-client.ts            # Provider-agnostic AI entry point
 │   ├── ai-processing.ts        # Prompt building, transcript chunking, candidate pooling
 │   ├── ai-providers/           # Grok & Gemini adapters + registry
 │   ├── notes-client.ts         # CSRF-protected note helpers
-│   ├── rate-limiter.ts         # Supabase-backed request limiting
+│   ├── rate-limiter.ts         # SQLite-backed request limiting
 │   ├── security-middleware.ts  # Common security wrapper for route handlers
-│   ├── supabase/               # Browser/server clients + middleware helpers
+│   ├── db/                      # Drizzle ORM + SQLite schema
 │   ├── validation.ts           # Zod schemas shared across endpoints
 │   └── utils.ts                # URL parsing, formatting, color helpers, etc.
 ├── public/                     # Static assets (logos, SVGs)
-├── supabase/
-│   └── migrations/             # Database migrations (e.g., topic_generation_mode column)
 ├── CLAUDE.md                   # Extended architecture + contributor handbook
 └── next.config.ts              # Remote image allowlist, Turbopack rules, webpack tweaks
 ```
@@ -92,7 +90,7 @@ The project is a Next.js 15 + React 19 application that wraps xAI’s Grok 4 Fas
 
 - Node.js 18+ (Next.js 15 requires 18.18 or newer)
 - `npm` (repo uses package-lock.json), though `pnpm` or `yarn` also work
-- Supabase project (Auth + Postgres) and API keys for Supadata & at least one AI provider (xAI Grok recommended, Gemini optional)
+- API keys for Supadata & at least one AI provider (xAI Grok recommended, Gemini optional)
 
 ### 1. Clone & Install
 
@@ -111,8 +109,7 @@ Create `.env.local` in the repo root:
 | `XAI_API_KEY` | yes* | xAI Grok API key (`grok-4-1-fast-non-reasoning` by default) |
 | `GEMINI_API_KEY` | optional* | Google Gemini API key (enable if `AI_PROVIDER=gemini`) |
 | `SUPADATA_API_KEY` | yes | Supadata transcript API key |
-| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Supabase anonymous key |
+| `DATABASE_URL` | optional | SQLite database path (defaults to `./local.db` for dev) |
 | `CSRF_SALT` | yes | Long random string used to sign CSRF tokens |
 | `AI_PROVIDER` | optional | `grok` (default) or `gemini`; determines which adapter is used |
 | `AI_DEFAULT_MODEL` | optional | Override provider default model (e.g., `grok-4-1-fast-non-reasoning`) |
@@ -126,12 +123,16 @@ Create `.env.local` in the repo root:
 
 > Generate a unique `CSRF_SALT` (e.g., `openssl rand -base64 32`). `UNLIMITED_VIDEO_USERS` entries are normalized to lowercase.
 
-### 3. Supabase Setup
+### 3. Database Setup
 
-1. Run SQL migrations in `supabase/migrations/` using the Supabase SQL editor or CLI.
-2. Ensure the following tables exist (structure documented in `CLAUDE.md`): `video_analyses`, `user_videos`, `user_notes`, `profiles`, and `rate_limits`.
-3. Add the Postgres function `upsert_video_analysis_with_user_link` that stores analyses and links them to a user in `user_videos` (the production project contains the reference implementation—export it or recreate it before local testing).
-4. Enable email OTP/auth providers required by your login flow and configure redirect URLs to match `NEXT_PUBLIC_APP_URL`.
+The app uses SQLite with Drizzle ORM. On first run, the database is automatically created at `./local.db` (or the path specified by `DATABASE_URL`).
+
+The schema is defined in `lib/db/schema.ts` and includes: `users`, `sessions`, `video_analyses`, `user_videos`, `notes`, `video_generations`, `image_generations`, and `rate_limits`.
+
+For migrations, run:
+```bash
+npm run db:migrate
+```
 
 ### 4. Run the App
 
@@ -147,12 +148,12 @@ The dev server reaches out to Supadata and your configured AI provider(s) direct
 - All state-changing requests must go through `csrfFetch` so that `withSecurity` can validate the token.
 - Rate limiting records are stored in the `rate_limits` table; clear it when resetting dev limits.
 - Topic generation mode (`smart` vs `fast`) is persisted per-profile and synced via `useModePreference`.
-- `middleware.ts` refreshes Supabase sessions and adds security headers—keep it enabled when deploying to Vercel.
+- `middleware.ts` handles session validation and adds security headers—keep it enabled when deploying to Vercel.
 - Detailed architecture notes, prompts, and database expectations live in `CLAUDE.md`; review it before larger changes.
 
 ## Contributing
 
-Issues and PRs are welcome. This repo uses the [Anthropic Claude Code Action](https://github.com/anthropics/claude-code-action) for automated pull-request reviews guided by `CLAUDE.md`. Please run `npm run lint` and double-check Supabase migrations before opening a PR.
+Issues and PRs are welcome. This repo uses the [Anthropic Claude Code Action](https://github.com/anthropics/claude-code-action) for automated pull-request reviews guided by `CLAUDE.md`. Please run `npm run lint` before opening a PR.
 
 ## License
 

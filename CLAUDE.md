@@ -68,7 +68,7 @@ The app uses Next.js 15 App Router with two main pages:
 #### User Data & Authentication
 - `/api/check-limit`: Validates rate limits for authenticated/anonymous users
 - `/api/check-video-cache`: Checks if video analysis already exists
-- `/api/video-analysis`: Fetches/stores analyzed video data in Supabase
+- `/api/video-analysis`: Fetches/stores analyzed video data in SQLite
 - `/api/update-video-analysis`: Updates existing video analysis
 - `/api/toggle-favorite`: Manages user video favorites
 - `/api/link-video`: Links video analysis to authenticated user account
@@ -117,7 +117,7 @@ The application supports dynamic topic generation based on user-selected themes:
    - `usedTopicKeys`: Set of candidate keys already used in topics
 
 #### Authentication & Security
-- **Supabase Auth**: User authentication with email/password and OAuth providers
+- **Lucia Auth**: User authentication with email/password and OAuth providers
 - **Rate Limiting**: Different limits for anonymous (3 videos/30 min) vs authenticated users
 - **Video Linking**: Post-authentication linking of anonymous analyses to user accounts
 - **Favorites System**: Users can favorite and manage their analyzed videos
@@ -150,18 +150,18 @@ Users can create, edit, and manage notes throughout the application:
 - `DELETE /api/notes`: Delete note by ID (requires auth)
 - `GET /api/notes/all`: Fetch all notes across all videos (requires auth)
 
-**Database Schema** (Supabase table: `notes`):
+**Database Schema** (SQLite table: `notes`):
 ```sql
 notes (
-  id: uuid PRIMARY KEY,
-  user_id: uuid REFERENCES auth.users,
-  video_id: uuid REFERENCES video_analyses,
+  id: text PRIMARY KEY,
+  user_id: text REFERENCES users(id),
+  video_id: text REFERENCES video_analyses(id),
   source: text,
-  source_id: text?,
+  source_id: text,
   text: text,
-  metadata: jsonb?,
-  created_at: timestamp,
-  updated_at: timestamp
+  metadata: text,
+  created_at: integer,
+  updated_at: integer
 )
 ```
 
@@ -261,19 +261,27 @@ The application uses aggressive parallel processing to minimize latency:
 
 ### Database Integration
 
-**Supabase Client**: Browser and server clients for data operations
-- `lib/supabase/client.ts`: Browser client using `createBrowserClient`
-- `lib/supabase/server.ts`: Server client with cookie-based auth
+**SQLite + Drizzle ORM**: The app uses SQLite with Drizzle ORM for data operations
+- `lib/db/index.ts`: Database connection and lazy initialization
+- `lib/db/schema.ts`: Table definitions using Drizzle schema syntax
 
-**Tables**:
-- `video_analyses`: Stores complete video analysis
-  - Fields: `id`, `youtube_id`, `user_id`, `title`, `author`, `thumbnail_url`, `duration`, `transcript`, `topics`, `summary`, `suggested_questions`, `created_at`, `updated_at`
-- `user_favorites`: User's favorited videos
-  - Fields: `user_id`, `video_analysis_id`, `created_at`
-- `rate_limit_logs`: Tracks API usage for rate limiting
-  - Fields: `identifier`, `action`, `timestamp`, `metadata`
+**Tables** (defined in `lib/db/schema.ts`):
+- `users`: User accounts with subscription info
+  - Fields: `id`, `email`, `emailVerified`, `name`, `image`, `passwordHash`, `createdAt`, `updatedAt`, `tier`, `subscriptionStatus`, `stripeCustomerId`, `stripeSubscriptionId`, `subscriptionCurrentPeriodStart`, `subscriptionCurrentPeriodEnd`, `cancelAtPeriodEnd`, `topupCredits`
+- `sessions`: User sessions (Lucia auth)
+  - Fields: `id`, `userId`, `expiresAt`, `ipAddress`, `userAgent`, `createdAt`, `updatedAt`
+- `videoAnalyses`: Stores complete video analysis
+  - Fields: `id`, `youtubeId`, `userId`, `title`, `author`, `thumbnailUrl`, `duration`, `transcript`, `topics`, `summary`, `suggestedQuestions`, `createdAt`, `updatedAt`
+- `userVideos`: User's favorited videos
+  - Fields: `id`, `userId`, `videoAnalysisId`, `isFavorite`, `createdAt`
 - `notes`: User notes on videos
-  - Fields: `id`, `user_id`, `video_id`, `source`, `source_id`, `text`, `metadata`, `created_at`, `updated_at`
+  - Fields: `id`, `userId`, `videoId`, `source`, `sourceId`, `text`, `metadata`, `createdAt`, `updatedAt`
+- `videoGenerations`: Tracks video generation usage
+  - Fields: `id`, `userId`, `identifier`, `youtubeId`, `videoId`, `counted`, `tier`, `createdAt`
+- `imageGenerations`: Tracks image generation usage
+  - Fields: `id`, `userId`, `youtubeId`, `videoId`, `counted`, `tier`, `createdAt`
+- `rateLimits`: Rate limiting records
+  - Fields: `id`, `key`, `identifier`, `action`, `timestamp`, `metadata`
 
 **Caching Strategy**:
 - Check cache before processing (`/api/check-video-cache`)
@@ -318,8 +326,8 @@ The application uses aggressive parallel processing to minimize latency:
 Required in `.env.local`:
 - `GEMINI_API_KEY`: Google Gemini API key for AI generation
 - `SUPADATA_API_KEY`: Supadata API key for transcript fetching
-- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key
+- `DATABASE_URL`: SQLite database path (optional, defaults to `./local.db` in development)
+- `CSRF_SALT`: Random string for CSRF token signing
 
 ### Deployment
 Optimized for Vercel deployment with Next.js 15 and Turbopack for fast builds and hot module replacement.

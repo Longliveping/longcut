@@ -45,7 +45,7 @@ export class BasePage {
   async clickWithRetry(locator: Locator, maxRetries: number = 3): Promise<void> {
     for (let i = 0; i < maxRetries; i++) {
       try {
-        await locator.waitFor({ state: 'visible', timeout: 5000 });
+        await expect(locator, { timeout: 5000 }).toBeVisible();
         await locator.click();
         return;
       } catch (error) {
@@ -59,7 +59,7 @@ export class BasePage {
    * Fill an input field with clear and type
    */
   async fillInput(locator: Locator, value: string): Promise<void> {
-    await locator.waitFor({ state: 'visible', timeout: 5000 });
+    await expect(locator, { timeout: 5000 }).toBeVisible();
     await locator.clear();
     await locator.fill(value);
     await expect(locator).toHaveValue(value);
@@ -69,21 +69,21 @@ export class BasePage {
    * Wait for an element to be visible
    */
   async waitForVisible(locator: Locator, timeout: number = 10000): Promise<void> {
-    await locator.waitFor({ state: 'visible', timeout });
+    await expect(locator, { timeout }).toBeVisible();
   }
 
   /**
    * Wait for an element to be hidden
    */
   async waitForHidden(locator: Locator, timeout: number = 10000): Promise<void> {
-    await locator.waitFor({ state: 'hidden', timeout });
+    await expect(locator, { timeout }).toBeHidden();
   }
 
   /**
    * Wait for an element to be attached to DOM
    */
   async waitForAttached(locator: Locator, timeout: number = 10000): Promise<void> {
-    await locator.waitFor({ state: 'attached', timeout });
+    await expect(locator, { timeout }).toBeAttached();
   }
 
   /**
@@ -99,7 +99,7 @@ export class BasePage {
    */
   async isVisible(locator: Locator): Promise<boolean> {
     try {
-      await locator.waitFor({ state: 'visible', timeout: 2000 });
+      await expect(locator, { timeout: 2000 }).toBeVisible();
       return true;
     } catch {
       return false;
@@ -111,7 +111,7 @@ export class BasePage {
    */
   async isHidden(locator: Locator): Promise<boolean> {
     try {
-      await locator.waitFor({ state: 'hidden', timeout: 2000 });
+      await expect(locator, { timeout: 2000 }).toBeHidden();
       return true;
     } catch {
       return false;

@@ -74,12 +74,12 @@
             - generic [ref=e26]: Email
             - textbox "Email" [ref=e27]:
               - /placeholder: you@example.com
-              - text: test-1771908478449-q7e2z6@e2e.test
+              - text: test-1771908489602-jr34uu@e2e.test
           - generic [ref=e28]:
             - generic [ref=e29]: Password
             - textbox "Password" [ref=e30]:
               - /placeholder: At least 6 characters
-              - text: TestPass123!mm04k44x
+              - text: TestPass123!mm04kcqq
           - alert [ref=e31]:
             - img [ref=e32]
             - generic [ref=e34]: Rate limit exceeded

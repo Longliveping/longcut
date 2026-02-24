@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth/lucia'
+import { createBlankSessionCookie, requireSession } from '@/lib/auth/lucia'
 import { cookies } from 'next/headers'
 import { db } from '@/lib/db'
 import { sessions } from '@/lib/db/schema'
@@ -7,18 +7,21 @@ import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
+    // Require valid session to sign out
+    const session = await requireSession()
+
     const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get(auth.sessionCookieName)
+    const sessionCookie = cookieStore.get('longcut_session')
 
     if (!sessionCookie) {
       return NextResponse.json({ success: true })
     }
 
-    // Manually delete session from database
-    await db.delete(sessions).where(eq(sessions.id, sessionCookie.value))
+    // Delete session from database
+    await db.delete(sessions).where(eq(sessions.id, session.session.id))
 
     // Create blank session cookie to clear the cookie
-    const blankCookie = auth.createBlankSessionCookie()
+    const blankCookie = createBlankSessionCookie()
     cookieStore.set(
       blankCookie.name,
       blankCookie.value,

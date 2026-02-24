@@ -1,23 +1,22 @@
-import { Lucia } from 'lucia'
-import { DrizzleSQLiteAdapter } from '@lucia-auth/adapter-drizzle'
-import { db } from '../db'
-import * as schema from '../db/schema'
 import { cookies } from 'next/headers'
 
-export const auth = new Lucia({
-  adapter: new DrizzleSQLiteAdapter(db, schema.users, schema.sessions),
-  sessionCookie: {
+/**
+ * Create a session cookie for Lucia
+ * Since we're manually managing sessions, we use this to create the cookie value
+ */
+export function createSessionCookie(sessionId: string) {
+  return {
+    name: 'longcut_session',
+    value: sessionId,
     attributes: {
+      path: '/',
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     },
-  },
-  getSessionAttributes: (attributes) => {
-    return {
-      userId: attributes.userId,
-      emailVerified: Boolean(attributes.emailVerified ?? 0),
-    }
-  },
-})
+  }
+}
 
 /**
  * Get the current session from cookies
@@ -25,17 +24,17 @@ export const auth = new Lucia({
  */
 export async function getSession() {
   const cookieStore = await cookies()
-  const sessionId = cookieStore.get(auth.sessionCookieName)?.value ?? null
+  const sessionId = cookieStore.get('longcut_session')?.value ?? null
   if (!sessionId) return null
 
   // Manually query the database for the session and user
   const { users, sessions } = await import('../db/schema')
   const { db } = await import('../db')
-  const { eq, and } = await import('drizzle-orm')
+  const { eq, and, gte } = await import('drizzle-orm')
 
   const now = Math.floor(Date.now() / 1000)
 
-  // Get session with user
+  // Get session with user, filtering by expiration at database level
   const result = await db
     .select({
       session: sessions,
@@ -46,7 +45,7 @@ export async function getSession() {
     .where(
       and(
         eq(sessions.id, sessionId),
-        eq(sessions.expiresAt, sessions.expiresAt) // Just to use sessions table
+        gte(sessions.expiresAt, now) // Filter expired sessions at DB level
       )
     )
     .limit(1)
@@ -54,13 +53,6 @@ export async function getSession() {
   if (result.length === 0) return null
 
   const sessionData = result[0]
-
-  // Check if session is expired
-  if (sessionData.session.expiresAt < now) {
-    // Delete expired session
-    await db.delete(sessions).where(eq(sessions.id, sessionId))
-    return null
-  }
 
   return {
     user: {
@@ -92,4 +84,22 @@ export async function requireSession() {
 /**
  * Type for the session user
  */
-export type SessionUser = Awaited<ReturnType<typeof getSession>>['user']
+type SessionType = Awaited<ReturnType<typeof getSession>>
+export type SessionUser = SessionType extends { user: infer U } ? U : never
+
+/**
+ * Empty session cookie for clearing
+ */
+export function createBlankSessionCookie() {
+  return {
+    name: 'longcut_session',
+    value: '',
+    attributes: {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      maxAge: 0,
+    },
+  }
+}

@@ -9,8 +9,8 @@ export async function middleware(req: NextRequest) {
   res.headers.set('X-Content-Type-Options', 'nosniff')
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
 
-  // better-auth handles session cookies automatically
-  // No manual refresh needed like Supabase
+  // Session cookies are managed by Lucia auth
+  // No manual refresh needed
 
   return res
 }

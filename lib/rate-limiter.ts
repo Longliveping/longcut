@@ -165,6 +165,7 @@ export class RateLimiter {
       await db.insert(rateLimits).values({
         id: crypto.randomUUID(),
         key: rateLimitKey,
+        action: key,
         identifier,
         timestamp: nowSec
       });
@@ -228,15 +229,15 @@ export const RATE_LIMITS = {
   // Subscription tier video generation limits (rolling 30-day window)
   VIDEO_GENERATION_FREE_UNREGISTERED: {
     windowMs: 30 * 24 * 60 * 60 * 1000, // 30 days
-    maxRequests: 0 // No video analysis for anonymous users
+    maxRequests: 300 // 300 videos per 30 days for all users
   },
   VIDEO_GENERATION_FREE_REGISTERED: {
     windowMs: 30 * 24 * 60 * 60 * 1000, // 30 days
-    maxRequests: 100 // 100 videos per 30 days for free registered users
+    maxRequests: 300 // 300 videos per 30 days for all users
   },
   VIDEO_GENERATION_PRO: {
     windowMs: 30 * 24 * 60 * 60 * 1000, // 30 days
-    maxRequests: 100 // 100 videos per 30 days for Pro subscribers
+    maxRequests: 300 // 300 videos per 30 days for all users
   },
 
   // General API endpoints

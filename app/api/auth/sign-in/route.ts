@@ -1,12 +1,14 @@
-import { auth } from '@/lib/auth/lucia'
+import { createSessionCookie } from '@/lib/auth/lucia'
 import { cookies } from 'next/headers'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
 import { users, sessions } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { withSecurity } from '@/lib/security-middleware'
+import { RATE_LIMITS } from '@/lib/rate-limiter'
 
-export async function POST(req: Request) {
+async function handler(req: Request) {
   try {
     const body = await req.json()
 
@@ -58,7 +60,7 @@ export async function POST(req: Request) {
       updatedAt: now,
     })
 
-    const sessionCookie = auth.createSessionCookie(sessionId)
+    const sessionCookie = createSessionCookie(sessionId)
 
     const cookieStore = await cookies()
     cookieStore.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
@@ -78,3 +80,9 @@ export async function POST(req: Request) {
     )
   }
 }
+
+export const POST = withSecurity(handler, {
+  rateLimit: RATE_LIMITS.AUTH_ATTEMPT,
+  maxBodySize: 1024, // 1KB - email + password
+  allowedMethods: ['POST']
+})

@@ -11,6 +11,8 @@ export interface TestUser {
   id?: string;
 }
 
+// Note: Lucia uses HTTP-only cookies, not access tokens
+// This interface is kept for reference but not used
 export interface AuthTokens {
   access_token: string;
   refresh_token: string;
@@ -46,8 +48,8 @@ export async function createTestUser(
   const testEmail = email || generateTestEmail();
   const testPassword = password || generateTestPassword();
 
-  // Use Supabase admin API or sign-up endpoint
-  const response = await request.post(`${baseURL}/api/auth/signup`, {
+  // Use sign-up endpoint
+  const response = await request.post(`${baseURL}/api/auth/sign-up`, {
     data: {
       email: testEmail,
       password: testPassword,
@@ -69,16 +71,16 @@ export async function createTestUser(
 }
 
 /**
- * Sign in via API and return session
+ * Sign in via API and return user (Lucia sets session cookie via headers)
  */
 export async function signInViaAPI(
   request: APIRequestContext,
   baseURL: string,
   email: string,
   password: string
-): Promise<{ session: any; tokens: AuthTokens } | null> {
+): Promise<{ user: any; session: any } | null> {
   try {
-    const response = await request.post(`${baseURL}/api/auth/signin`, {
+    const response = await request.post(`${baseURL}/api/auth/sign-in`, {
       data: {
         email,
         password,
@@ -90,9 +92,10 @@ export async function signInViaAPI(
     }
 
     const data = await response.json();
+    // Lucia sets session cookie via HTTP headers, so we get user in response
     return {
-      session: data.session,
-      tokens: data.tokens,
+      user: data.user,
+      session: null, // Session is in HTTP-only cookie
     };
   } catch (error) {
     console.error('Sign in via API failed:', error);
@@ -109,7 +112,7 @@ export async function signOutViaAPI(
   accessToken: string
 ): Promise<boolean> {
   try {
-    const response = await request.post(`${baseURL}/api/auth/signout`, {
+    const response = await request.post(`${baseURL}/api/auth/sign-out`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -147,65 +150,58 @@ export async function deleteTestUser(
 }
 
 /**
- * Get current auth state from localStorage
+ * Get current auth state from cookies (Lucia auth)
+ * Lucia uses HTTP-only cookies for session management
  */
 export async function getAuthState(page: Page): Promise<any> {
-  return await page.evaluate(() => {
-    // Check for Supabase auth tokens
-    const supabaseAuth = localStorage.getItem('supabase.auth.token');
-    if (supabaseAuth) {
-      try {
-        return JSON.parse(supabaseAuth);
-      } catch {
-        return null;
+  // Check for Lucia session cookie
+  const cookies = await page.context().cookies();
+  const sessionCookie = cookies.find(c => c.name === 'longcut_session');
+
+  if (sessionCookie) {
+    try {
+      // Try to get session from API
+      const response = await page.request.get('/api/auth/session');
+      if (response.ok) {
+        return await response.json();
       }
+    } catch {
+      return null;
     }
-    return null;
-  });
+  }
+  return null;
 }
 
 /**
- * Set auth state in localStorage (bypass UI login)
+ * Set auth state - Lucia uses cookies set server-side
+ * Use signInViaAPI instead to authenticate
  */
 export async function setAuthState(page: Page, authData: any): Promise<void> {
-  await page.evaluate((data) => {
-    localStorage.setItem('supabase.auth.token', JSON.stringify(data));
-  }, authData);
+  // Lucia auth uses server-side cookies, so we can't bypass the login flow
+  // Use signInViaAPI() to authenticate in tests instead
+  console.warn('setAuthState is not supported with Lucia auth. Use signInViaAPI() instead.');
 }
 
 /**
- * Clear auth state from localStorage and sessionStorage
+ * Clear auth state from cookies (Lucia auth)
  */
 export async function clearAuthState(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    // Clear localStorage
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (key.includes('supabase') || key.includes('auth'))) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
+  // Clear Lucia session cookie
+  await page.context().clearCookies();
 
-    // Clear sessionStorage
-    const sessionKeysToRemove: string[] = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      if (key && (key.includes('supabase') || key.includes('auth') || key.includes('pending'))) {
-        sessionKeysToRemove.push(key);
-      }
-    }
-    sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
+  // Also clear localStorage for any client-side auth state
+  await page.evaluate(() => {
+    localStorage.clear();
+    sessionStorage.clear();
   });
 }
 
 /**
- * Check if user is authenticated
+ * Check if user is authenticated (Lucia uses cookies)
  */
 export async function isAuthenticated(page: Page): Promise<boolean> {
   const authState = await getAuthState(page);
-  return authState !== null && authState.currentSession !== null;
+  return authState !== null && authState.user !== null;
 }
 
 /**
@@ -213,7 +209,7 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
  */
 export async function getCurrentUser(page: Page): Promise<any> {
   const authState = await getAuthState(page);
-  return authState?.currentSession?.user || null;
+  return authState?.user || null;
 }
 
 /**

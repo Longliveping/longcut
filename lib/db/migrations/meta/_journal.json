@@ -29,6 +29,13 @@
       "when": 1771773980112,
       "tag": "0003_rich_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1771943011403,
+      "tag": "0004_jazzy_starfox",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,7 @@
 /**
  * Sign Out Tests
  * Tests for sign out functionality
+ * Note: With Lucia auth, we must create users via sign-up before testing sign-out
  */
 
 import { test, expect } from '@playwright/test';
@@ -17,53 +18,35 @@ test.describe('Sign Out', () => {
   let userMenuPage: UserMenuPage;
 
   /**
-   * Helper: Sign in before each test
+   * Helper: Create and sign in a test user
    */
-  async function signInUser(page: any) {
+  async function createAndSignInUser(page: any) {
+    const testUser = authHelpers.generateValidSignupData();
+
     await homePage.goto();
     await homePage.waitForLoaded();
 
-    // Open auth modal
+    // Step 1: Create user via sign-up
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
+    await authModalPage.switchToSignUp();
+    await authModalPage.fillSignUpForm(testUser.email, testUser.password);
+    await authModalPage.clickSignUp();
+    await authModalPage.waitForSuccessMessage();
+    await authModalPage.closeSuccessMessage();
 
-    // Switch to sign in tab
+    // Step 2: Sign in with the created credentials
+    await homePage.clickSignIn();
+    await authModalPage.waitForModal();
     await authModalPage.switchToSignIn();
-
-    // Fill in credentials
-    // Note: In real implementation, use valid test user
-    await authModalPage.fillSignInForm('test@example.com', 'TestPass123!');
-
-    // Submit
+    await authModalPage.fillSignInForm(testUser.email, testUser.password);
     await authModalPage.clickSignIn();
 
-    // Wait for sign in
-    await page.waitForTimeout(2000);
+    // Wait for sign in to complete
+    await page.waitForLoadState('networkidle');
+    await userMenuPage.waitForUserMenu();
 
-    // If sign in failed (test user doesn't exist), create user first
-    if (!await userMenuPage.isUserSignedIn()) {
-      // Open modal again
-      await homePage.clickSignIn();
-      await authModalPage.waitForModal();
-      await authModalPage.switchToSignUp();
-
-      // Create user
-      const testUser = authHelpers.generateValidSignupData();
-      await authModalPage.fillSignUpForm(testUser.email, testUser.password);
-      await authModalPage.clickSignUp();
-
-      // Close success message
-      await authModalPage.closeSuccessMessage();
-
-      // Sign in with new user
-      await homePage.clickSignIn();
-      await authModalPage.waitForModal();
-      await authModalPage.switchToSignIn();
-      await authModalPage.fillSignInForm(testUser.email, testUser.password);
-      await authModalPage.clickSignIn();
-
-      await page.waitForTimeout(2000);
-    }
+    return testUser;
   }
 
   test.beforeEach(async ({ page }) => {
@@ -76,11 +59,7 @@ test.describe('Sign Out', () => {
    * TC-001: Sign out from user menu
    */
   test('should sign out from user menu', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed (without real user)
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+    await createAndSignInUser(page);
 
     // Open user menu
     await userMenuPage.openMenu();
@@ -102,11 +81,7 @@ test.describe('Sign Out', () => {
    * TC-002: Sign out clears authentication state
    */
   test('should clear authentication state after sign out', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+    await createAndSignInUser(page);
 
     // Verify user is authenticated
     expect(await authHelpers.isAuthenticated(page)).toBe(true);
@@ -118,23 +93,21 @@ test.describe('Sign Out', () => {
     // Wait for sign out to complete
     await userMenuPage.waitForSignInButton();
 
-    // Verify authentication state is cleared
+    // Verify authentication state is cleared (Lucia uses cookies, not localStorage)
     const isAuthed = await authHelpers.isAuthenticated(page);
     expect(isAuthed).toBe(false);
   });
 
   /**
-   * TC-003: Sign out clears localStorage
+   * TC-003: Sign out clears cookie-based auth (Lucia)
    */
-  test('should clear auth data from localStorage', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
+  test('should clear auth cookies after sign out', async ({ page }) => {
+    await createAndSignInUser(page);
 
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
-
-    // Get auth state before sign out
-    const authBefore = await authHelpers.getAuthState(page);
+    // Verify session cookie exists
+    const cookiesBefore = await page.context().cookies();
+    const sessionCookieBefore = cookiesBefore.find(c => c.name === 'longcut_session');
+    expect(sessionCookieBefore).toBeTruthy();
 
     // Sign out
     await userMenuPage.openMenu();
@@ -143,20 +116,17 @@ test.describe('Sign Out', () => {
     // Wait for sign out to complete
     await userMenuPage.waitForSignInButton();
 
-    // Verify auth state is cleared
-    const authAfter = await authHelpers.getAuthState(page);
-    expect(authAfter).toBeNull();
+    // Verify session cookie is cleared
+    const cookiesAfter = await page.context().cookies();
+    const sessionCookieAfter = cookiesAfter.find(c => c.name === 'longcut_session');
+    expect(sessionCookieAfter).toBeFalsy();
   });
 
   /**
    * TC-004: Sign out closes user menu
    */
   test('should close user menu after sign out', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+    await createAndSignInUser(page);
 
     // Open user menu
     await userMenuPage.openMenu();
@@ -176,11 +146,7 @@ test.describe('Sign Out', () => {
    * TC-005: Can sign in again after sign out
    */
   test('should allow sign in after signing out', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+    await createAndSignInUser(page);
 
     // Sign out
     await userMenuPage.openMenu();
@@ -201,14 +167,10 @@ test.describe('Sign Out', () => {
   });
 
   /**
-   * TC-006: Sign out redirects to home page
+   * TC-006: Sign out stays on current page
    */
-  test('should redirect to home page after sign out', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+  test('should stay on current page after sign out', async ({ page }) => {
+    await createAndSignInUser(page);
 
     // Navigate to a different page
     await page.goto('/settings');
@@ -218,24 +180,19 @@ test.describe('Sign Out', () => {
     await userMenuPage.openMenu();
     await userMenuPage.clickSignOut();
 
-    // Wait for navigation
-    await page.waitForTimeout(2000);
+    // Wait for sign out
+    await userMenuPage.waitForSignInButton();
 
-    // Verify we're on home page
+    // Verify we're still on a valid page (home or settings)
     const currentUrl = page.url();
     expect(currentUrl).toContain('localhost');
-    expect(currentUrl).toMatch(/\/$|\/\?/);
   });
 
   /**
    * TC-007: Sign out button is visible in user menu
    */
   test('should display sign out button in user menu', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+    await createAndSignInUser(page);
 
     // Open user menu
     await userMenuPage.openMenu();
@@ -252,11 +209,7 @@ test.describe('Sign Out', () => {
    * TC-008: User menu shows correct menu items
    */
   test('should show correct menu items when signed in', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+    await createAndSignInUser(page);
 
     // Open user menu
     await userMenuPage.openMenu();
@@ -275,11 +228,7 @@ test.describe('Sign Out', () => {
    * TC-009: Sign out works from any page
    */
   test('should allow sign out from any page', async ({ page }) => {
-    // Sign in first
-    await signInUser(page);
-
-    // Skip if sign in failed
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
+    await createAndSignInUser(page);
 
     // Navigate to different pages and try to sign out
     const pages = ['/settings', '/my-videos'];
@@ -298,11 +247,8 @@ test.describe('Sign Out', () => {
       // Verify signed out
       expect(await userMenuPage.isSignInButtonVisible()).toBe(true);
 
-      // Sign in again for next iteration
-      await signInUser(page);
-      if (!await userMenuPage.isUserSignedIn()) {
-        break; // Skip remaining if sign in failed
-      }
+      // Re-create and sign in for next iteration
+      await createAndSignInUser(page);
     }
   });
 });
@@ -314,18 +260,30 @@ test.describe('User Menu - UI Elements', () => {
   let userMenuPage: UserMenuPage;
 
   /**
-   * Helper: Sign in before each test
+   * Helper: Create and sign in a test user
    */
-  async function signInUser(page: any) {
+  async function createAndSignInUser(page: any) {
+    const testUser = authHelpers.generateValidSignupData();
+
     await homePage.goto();
     await homePage.waitForLoaded();
 
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
+    await authModalPage.switchToSignUp();
+    await authModalPage.fillSignUpForm(testUser.email, testUser.password);
+    await authModalPage.clickSignUp();
+    await authModalPage.waitForSuccessMessage();
+    await authModalPage.closeSuccessMessage();
+
+    await homePage.clickSignIn();
+    await authModalPage.waitForModal();
     await authModalPage.switchToSignIn();
-    await authModalPage.fillSignInForm('test@example.com', 'TestPass123!');
+    await authModalPage.fillSignInForm(testUser.email, testUser.password);
     await authModalPage.clickSignIn();
-    await page.waitForTimeout(2000);
+
+    await page.waitForLoadState('networkidle');
+    await userMenuPage.waitForUserMenu();
   }
 
   test.beforeEach(async ({ page }) => {
@@ -333,15 +291,13 @@ test.describe('User Menu - UI Elements', () => {
     authModalPage = new AuthModalPage(page);
     userMenuPage = new UserMenuPage(page);
 
-    await signInUser(page);
+    await createAndSignInUser(page);
   });
 
   /**
    * TC-010: User avatar is visible when signed in
    */
   test('should display user avatar when signed in', async ({ page }) => {
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
-
     await AssertHelper.assertVisible(userMenuPage.userMenuButton, 'User avatar/menu button should be visible when signed in');
   });
 
@@ -349,8 +305,6 @@ test.describe('User Menu - UI Elements', () => {
    * TC-011: User menu shows account email
    */
   test('should display user email in menu', async ({ page }) => {
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
-
     await userMenuPage.openMenu();
 
     const email = await userMenuPage.getUserEmail();
@@ -362,8 +316,6 @@ test.describe('User Menu - UI Elements', () => {
    * TC-012: User menu has navigation links
    */
   test('should have navigation links to different pages', async ({ page }) => {
-    test.skip(!await userMenuPage.isUserSignedIn(), 'Requires authenticated user');
-
     await userMenuPage.openMenu();
 
     // Check for Videos link

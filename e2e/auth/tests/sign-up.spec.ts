@@ -48,25 +48,30 @@ test.describe('Sign Up - Email and Password', () => {
     // Verify success message contains email
     const successText = await authModalPage.getSuccessMessage();
     expect(successText).toContain(testUser.email);
-    expect(successText).toContain('Check your email');
+    expect(successText).toMatch(/created|sign in/i);
   });
 
   /**
    * TC-002: Failed sign up with existing email
    */
   test('should show error with existing email', async ({ page }) => {
-    // Use a known existing email (in real test, create user first)
-    const existingEmail = 'existing@example.com';
+    // First, create a user
+    const testUser = authHelpers.generateValidSignupData();
 
-    // Open auth modal
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
+    await authModalPage.switchToSignUp();
+    await authModalPage.fillSignUpForm(testUser.email, testUser.password);
+    await authModalPage.clickSignUp();
+    await authModalPage.waitForSuccessMessage();
+    await authModalPage.closeSuccessMessage();
 
-    // Switch to sign up tab
+    // Now try to sign up with the same email
+    await homePage.clickSignIn();
+    await authModalPage.waitForModal();
     await authModalPage.switchToSignUp();
 
-    // Try to sign up with existing email
-    await authModalPage.fillSignUpForm(existingEmail, 'TestPass123!');
+    await authModalPage.fillSignUpForm(testUser.email, 'DifferentPass123!');
     await authModalPage.clickSignUp();
 
     // Wait for error message
@@ -212,9 +217,8 @@ test.describe('Sign Up - Email and Password', () => {
 
     // Verify success message content
     const successText = await authModalPage.getSuccessMessage();
-    expect(successText).toContain('Check your email');
+    expect(successText).toMatch(/account created|sign in/i);
     expect(successText).toContain(testUser.email);
-    expect(successText).toContain('confirmation');
   });
 
   /**

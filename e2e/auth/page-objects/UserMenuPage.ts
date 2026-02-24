@@ -25,8 +25,8 @@ export class UserMenuPage extends BasePage {
   constructor(page: Page, baseUrl?: string) {
     super(page, baseUrl);
 
-    // User menu elements
-    this.userMenuButton = page.locator('button[aria-expanded][data-state]', '.avatar');
+    // User menu elements - Lucia auth uses avatar button for authenticated users
+    this.userMenuButton = page.locator('button:has(.avatar), button:has([data-radix-dropdown-menu-trigger])');
     this.userMenuDropdown = page.locator('[role="menu"], [data-radix-dropdown-menu-content]');
 
     // Authenticated menu items

@@ -1,6 +1,7 @@
 /**
  * Session Persistence Tests
  * Tests for authentication session persistence across page loads and browser sessions
+ * Note: Lucia auth uses HTTP-only cookies, not localStorage
  */
 
 import { test, expect } from '@playwright/test';
@@ -8,58 +9,41 @@ import { HomePage } from '../page-objects/HomePage';
 import { AuthModalPage } from '../page-objects/AuthModalPage';
 import { UserMenuPage } from '../page-objects/UserMenuPage';
 import * as authHelpers from '../helpers/auth-helpers';
-import { AssertHelper } from '../helpers/test-helpers';
 
-// Test suite: Session Persistence
+// Test suite: Session Persistence (Lucia Cookie-based Auth)
 test.describe('Session Persistence', () => {
   let homePage: HomePage;
   let authModalPage: AuthModalPage;
   let userMenuPage: UserMenuPage;
 
   /**
-   * Helper: Sign in and return credentials
+   * Helper: Create and sign in a test user
    */
-  async function signInUser(page: any): Promise<{ email: string; password: string } | null> {
+  async function createAndSignInUser(page: any): Promise<{ email: string; password: string } | null> {
+    const testUser = authHelpers.generateValidSignupData();
+
     await homePage.goto();
     await homePage.waitForLoaded();
 
-    // Open auth modal
-    await homePage.clickSignIn();
-    await authModalPage.waitForModal();
-
-    // Try to sign in
-    await authModalPage.switchToSignIn();
-    const email = 'test@example.com';
-    const password = 'TestPass123!';
-
-    await authModalPage.fillSignInForm(email, password);
-    await authModalPage.clickSignIn();
-
-    await page.waitForTimeout(2000);
-
-    if (await userMenuPage.isUserSignedIn()) {
-      return { email, password };
-    }
-
-    // If sign in failed, create user first
+    // Create user via sign-up
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
     await authModalPage.switchToSignUp();
-
-    const testUser = authHelpers.generateValidSignupData();
     await authModalPage.fillSignUpForm(testUser.email, testUser.password);
     await authModalPage.clickSignUp();
-
+    await authModalPage.waitForSuccessMessage();
     await authModalPage.closeSuccessMessage();
 
-    // Sign in with new user
+    // Sign in
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
     await authModalPage.switchToSignIn();
     await authModalPage.fillSignInForm(testUser.email, testUser.password);
     await authModalPage.clickSignIn();
 
-    await page.waitForTimeout(2000);
+    // Wait for sign in
+    await page.waitForLoadState('networkidle');
+    await userMenuPage.waitForUserMenu();
 
     if (await userMenuPage.isUserSignedIn()) {
       return testUser;
@@ -75,11 +59,10 @@ test.describe('Session Persistence', () => {
   });
 
   /**
-   * TC-001: Session persists across page reload
+   * TC-001: Session persists across page reload (cookie-based)
    */
   test('should maintain session after page reload', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in
@@ -88,7 +71,7 @@ test.describe('Session Persistence', () => {
     // Reload page
     await page.reload({ waitUntil: 'networkidle' });
 
-    // Verify user is still signed in
+    // Verify user is still signed in (session cookie persists)
     await userMenuPage.waitForUserMenu();
     expect(await userMenuPage.isUserSignedIn()).toBe(true);
   });
@@ -97,8 +80,7 @@ test.describe('Session Persistence', () => {
    * TC-002: Session persists across navigation
    */
   test('should maintain session when navigating between pages', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in
@@ -111,7 +93,7 @@ test.describe('Session Persistence', () => {
       await page.goto(path);
       await page.waitForLoadState('networkidle');
 
-      // Verify user is still signed in
+      // Verify user is still signed in (cookie is sent with each request)
       expect(await userMenuPage.isUserSignedIn()).toBe(true);
     }
   });
@@ -120,21 +102,20 @@ test.describe('Session Persistence', () => {
    * TC-003: Session persists across browser tabs (same context)
    */
   test('should maintain session across browser tabs', async ({ page, context }) => {
-    // Sign in first tab
-    const credentials = await signInUser(page);
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in first tab
     expect(await userMenuPage.isUserSignedIn()).toBe(true);
 
-    // Open new tab
+    // Open new tab (cookies are shared across tabs in same context)
     const newPage = await context.newPage();
 
     // Navigate to home page in new tab
     await newPage.goto('/');
     await newPage.waitForLoadState('networkidle');
 
-    // Verify user is signed in new tab
+    // Verify user is signed in new tab (cookie is available)
     const newUserMenu = new UserMenuPage(newPage);
     await newUserMenu.waitForUserMenu();
     expect(await newUserMenu.isUserSignedIn()).toBe(true);
@@ -143,73 +124,64 @@ test.describe('Session Persistence', () => {
   });
 
   /**
-   * TC-004: Session data stored in localStorage
+   * TC-004: Session stored in HTTP-only cookie (Lucia)
    */
-  test('should store session data in localStorage', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+  test('should store session in HTTP-only cookie', async ({ page }) => {
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in
     expect(await userMenuPage.isUserSignedIn()).toBe(true);
 
-    // Get localStorage
-    const storage = await homePage.getLocalStorage();
+    // Get cookies
+    const cookies = await page.context().cookies();
 
-    // Verify auth tokens are stored
-    const hasAuthTokens = Object.keys(storage).some(key =>
-      key.toLowerCase().includes('supabase') || key.toLowerCase().includes('auth')
-    );
+    // Verify longcut_session cookie exists
+    const sessionCookie = cookies.find(c => c.name === 'longcut_session');
+    expect(sessionCookie).toBeTruthy();
 
-    expect(hasAuthTokens).toBe(true);
+    // Verify cookie is HTTP-only
+    expect(sessionCookie?.httpOnly).toBe(true);
+
+    // Verify cookie has expiration (7 days)
+    expect(sessionCookie?.expires).toBeGreaterThan(Date.now() / 1000);
   });
 
   /**
-   * TC-005: Session restored from localStorage on page load
+   * TC-005: Clearing session cookie signs user out
    */
-  test('should restore session from localStorage', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+  test('should sign out when session cookie is cleared', async ({ page }) => {
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
-    // Get auth state
-    const authStateBefore = await authHelpers.getAuthState(page);
-    expect(authStateBefore).not.toBeNull();
+    // Verify user is signed in
+    expect(await userMenuPage.isUserSignedIn()).toBe(true);
 
-    // Clear session and reload
-    await authHelpers.clearAuthState(page);
+    // Clear session cookie
+    await page.context().clearCookies();
 
     // Reload page
     await page.reload({ waitUntil: 'networkidle' });
 
     // Verify user is signed out
     expect(await userMenuPage.isUserSignedIn()).toBe(false);
-
-    // Restore auth state
-    await authHelpers.setAuthState(page, authStateBefore);
-
-    // Reload page
-    await page.reload({ waitUntil: 'networkidle' });
-
-    // Verify user is signed in again
-    await userMenuPage.waitForUserMenu();
-    expect(await userMenuPage.isUserSignedIn()).toBe(true);
+    expect(await userMenuPage.isSignInButtonVisible()).toBe(true);
   });
 
   /**
    * TC-006: Session expires after sign out
    */
-  test('should expire session after sign out', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+  test('should clear session after sign out', async ({ page }) => {
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in
     expect(await userMenuPage.isUserSignedIn()).toBe(true);
 
-    // Get auth state
-    const authState = await authHelpers.getAuthState(page);
-    expect(authState).not.toBeNull();
+    // Verify session cookie exists
+    const cookiesBefore = await page.context().cookies();
+    const sessionCookieBefore = cookiesBefore.find(c => c.name === 'longcut_session');
+    expect(sessionCookieBefore).toBeTruthy();
 
     // Sign out
     await userMenuPage.openMenu();
@@ -218,22 +190,23 @@ test.describe('Session Persistence', () => {
     // Wait for sign out
     await userMenuPage.waitForSignInButton();
 
-    // Verify auth state is cleared
-    const authStateAfter = await authHelpers.getAuthState(page);
-    expect(authStateAfter).toBeNull();
+    // Verify session cookie is cleared
+    const cookiesAfter = await page.context().cookies();
+    const sessionCookieAfter = cookiesAfter.find(c => c.name === 'longcut_session');
+    expect(sessionCookieAfter).toBeFalsy();
 
-    // Reload page
+    // Reload page to verify sign out persisted
     await page.reload({ waitUntil: 'networkidle' });
 
-    // Verify user is still signed out
     expect(await userMenuPage.isUserSignedIn()).toBe(false);
     expect(await userMenuPage.isSignInButtonVisible()).toBe(true);
   });
 
   /**
-   * TC-007: Session persists after closing and reopening browser (with remember me)
+   * TC-007: Session persists after closing and reopening browser
+   * Note: Playwright contexts persist cookies by default
    */
-  test('should persist session after closing browser context', async ({ browser }) => {
+  test('should persist session after closing and reopening context', async ({ browser }) => {
     // Create new context and page
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -242,19 +215,28 @@ test.describe('Session Persistence', () => {
     const testAuthModal = new AuthModalPage(page);
     const testUserMenu = new UserMenuPage(page);
 
-    // Sign in
+    // Create and sign in user
+    const testUser = authHelpers.generateValidSignupData();
+
     await testHomePage.goto();
     await testHomePage.waitForLoaded();
 
     await testHomePage.clickSignIn();
     await testAuthModal.waitForModal();
-    await testAuthModal.switchToSignIn();
+    await testAuthModal.switchToSignUp();
+    await testAuthModal.fillSignUpForm(testUser.email, testUser.password);
+    await testAuthModal.clickSignUp();
+    await testAuthModal.waitForSuccessMessage();
+    await testAuthModal.closeSuccessMessage();
 
-    // Note: This test requires a real user to properly test persistence
-    await testAuthModal.fillSignInForm('test@example.com', 'TestPass123!');
+    await testHomePage.clickSignIn();
+    await testAuthModal.waitForModal();
+    await testAuthModal.switchToSignIn();
+    await testAuthModal.fillSignInForm(testUser.email, testUser.password);
     await testAuthModal.clickSignIn();
 
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
+    await testUserMenu.waitForUserMenu();
 
     // Skip if sign in failed
     if (!await testUserMenu.isUserSignedIn()) {
@@ -263,12 +245,17 @@ test.describe('Session Persistence', () => {
       return;
     }
 
-    // Close context
+    // Verify session cookie exists
+    const cookiesBefore = await context.cookies();
+    const sessionCookieBefore = cookiesBefore.find(c => c.name === 'longcut_session');
+    expect(sessionCookieBefore).toBeTruthy();
+
+    // Close and recreate context (simulates browser restart)
     await context.close();
 
-    // Create new context (simulates browser restart)
+    // Create new context with storage state from cookies
     const newContext = await browser.newContext({
-      storageState: 'test-results/storage-state.json', // Would save state before closing
+      storageState: { cookies: cookiesBefore },
     });
     const newPage = await newContext.newPage();
 
@@ -278,64 +265,61 @@ test.describe('Session Persistence', () => {
 
     // Verify user is still signed in
     const newUserMenu = new UserMenuPage(newPage);
-
-    // This would require proper storage state persistence
-    // For now, just verify the page loads
-    expect(newPage.url()).toContain('localhost');
+    await newUserMenu.waitForUserMenu();
+    expect(await newUserMenu.isUserSignedIn()).toBe(true);
 
     await newContext.close();
   });
 
   /**
-   * TC-008: Session handles token refresh
+   * TC-008: Session remains valid over time
    */
-  test('should refresh tokens automatically', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
-    test.skip(!credentials, 'Requires authenticated user');
-
-    // Get initial auth state
-    const authStateBefore = await authHelpers.getAuthState(page);
-    expect(authStateBefore).not.toBeNull();
-
-    // Wait for potential token refresh
-    await page.waitForTimeout(5000);
-
-    // Get auth state after wait
-    const authStateAfter = await authHelpers.getAuthState(page);
-
-    // User should still be authenticated
-    expect(await userMenuPage.isUserSignedIn()).toBe(true);
-  });
-
-  /**
-   * TC-009: Clearing localStorage signs user out
-   */
-  test('should sign out when localStorage is cleared', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+  test('should maintain session over time', async ({ page }) => {
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in
     expect(await userMenuPage.isUserSignedIn()).toBe(true);
 
-    // Clear localStorage
-    await homePage.clearLocalStorage();
+    // Wait a bit to simulate time passing
+    await page.waitForTimeout(3000);
+
+    // User should still be authenticated
+    expect(await userMenuPage.isUserSignedIn()).toBe(true);
+
+    // Reload to verify session is still valid
+    await page.reload({ waitUntil: 'networkidle' });
+    expect(await userMenuPage.isUserSignedIn()).toBe(true);
+  });
+
+  /**
+   * TC-009: Clearing cookies (including localStorage) doesn't affect cookie-based auth
+   * Note: Clearing localStorage doesn't sign out Lucia users since auth is in cookies
+   */
+  test('should not sign out when only localStorage is cleared', async ({ page }) => {
+    const credentials = await createAndSignInUser(page);
+    test.skip(!credentials, 'Requires authenticated user');
+
+    // Verify user is signed in
+    expect(await userMenuPage.isUserSignedIn()).toBe(true);
+
+    // Clear localStorage (but not cookies)
+    await page.evaluate(() => {
+      localStorage.clear();
+    });
 
     // Reload page
     await page.reload({ waitUntil: 'networkidle' });
 
-    // Verify user is signed out
-    expect(await userMenuPage.isUserSignedIn()).toBe(false);
-    expect(await userMenuPage.isSignInButtonVisible()).toBe(true);
+    // Verify user is STILL signed in (cookie is still there)
+    expect(await userMenuPage.isUserSignedIn()).toBe(true);
   });
 
   /**
    * TC-010: Session persists across browser back/forward navigation
    */
   test('should maintain session with back/forward navigation', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in
@@ -367,9 +351,8 @@ test.describe('Session Persistence', () => {
    * TC-011: User data accessible after page reload
    */
   test('should provide access to user data after reload', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
-    test.skip(!credentials || !credentials, 'Requires authenticated user');
+    const credentials = await createAndSignInUser(page);
+    test.skip(!credentials, 'Requires authenticated user');
 
     // Get user info before reload
     const userBefore = await authHelpers.getCurrentUser(page);
@@ -390,8 +373,7 @@ test.describe('Session Persistence', () => {
    * TC-012: Session state consistent across multiple rapid navigations
    */
   test('should maintain session consistency with rapid navigation', async ({ page }) => {
-    // Sign in
-    const credentials = await signInUser(page);
+    const credentials = await createAndSignInUser(page);
     test.skip(!credentials, 'Requires authenticated user');
 
     // Verify user is signed in
@@ -409,7 +391,7 @@ test.describe('Session Persistence', () => {
   });
 });
 
-// Test suite: Session Storage
+// Test suite: Session Storage (for video linking, not auth)
 test.describe('Session Storage', () => {
   let homePage: HomePage;
 
@@ -420,9 +402,10 @@ test.describe('Session Storage', () => {
 
   /**
    * TC-013: Pending video ID stored in sessionStorage
+   * Note: This is for video linking, not auth
    */
   test('should store pending video ID in sessionStorage', async ({ page }) => {
-    // Set a pending video ID
+    // Set a pending video ID (used for linking videos after auth)
     const videoId = 'test-video-123';
     await homePage.setSessionStorageItem('pendingVideoId', videoId);
 
@@ -438,9 +421,9 @@ test.describe('Session Storage', () => {
   });
 
   /**
-   * TC-014: SessionStorage cleared on sign out
+   * TC-014: SessionStorage can be cleared
    */
-  test('should clear sessionStorage on sign out', async ({ page }) => {
+  test('should clear sessionStorage', async ({ page }) => {
     // Set some session storage data
     await homePage.setSessionStorageItem('testKey', 'testValue');
     await homePage.setSessionStorageItem('pendingVideoId', 'video-123');
@@ -449,7 +432,7 @@ test.describe('Session Storage', () => {
     const storageBefore = await homePage.getSessionStorage();
     expect(storageBefore['testKey']).toBe('testValue');
 
-    // Clear session storage (simulating sign out)
+    // Clear session storage
     await page.evaluate(() => {
       sessionStorage.clear();
     });

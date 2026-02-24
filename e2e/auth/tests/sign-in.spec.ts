@@ -1,14 +1,15 @@
 /**
  * Sign In Tests
  * Tests for email/password sign in functionality
+ * Note: With Lucia auth, we must create users via sign-up before testing sign-in
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { HomePage } from '../page-objects/HomePage';
 import { AuthModalPage } from '../page-objects/AuthModalPage';
 import { UserMenuPage } from '../page-objects/UserMenuPage';
 import * as authHelpers from '../helpers/auth-helpers';
-import { TestData, AssertHelper } from '../helpers/test-helpers';
+import { AssertHelper } from '../helpers/test-helpers';
 
 // Test suite: Sign In with Email and Password
 test.describe('Sign In - Email and Password', () => {
@@ -28,50 +29,50 @@ test.describe('Sign In - Email and Password', () => {
 
   /**
    * TC-001: Successful sign in with valid credentials
+   * Note: Must first create user via sign-up, then sign in
    */
   test('should sign in successfully with valid credentials', async ({ page }) => {
-    // Create test user first
     const testUser = authHelpers.generateValidSignupData();
-    // Note: In real implementation, user would be created via API or UI
 
-    // Open auth modal
+    // Step 1: Create user via sign-up
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
+    await authModalPage.switchToSignUp();
+    await authModalPage.fillSignUpForm(testUser.email, testUser.password);
+    await authModalPage.clickSignUp();
+    await authModalPage.waitForSuccessMessage();
+    await authModalPage.closeSuccessMessage();
 
-    // Switch to sign in tab
+    // Step 2: Sign in with the created credentials
+    await homePage.clickSignIn();
+    await authModalPage.waitForModal();
     await authModalPage.switchToSignIn();
-
-    // Fill in credentials
     await authModalPage.fillSignInForm(testUser.email, testUser.password);
-
-    // Submit form
     await authModalPage.clickSignIn();
 
-    // Wait for successful sign in
-    await userMenuPage.waitForUserMenu();
+    // Wait for page reload after successful sign-in
+    await page.waitForLoadState('networkidle');
 
-    // Verify user is signed in
-    await AssertHelper.assertVisible(userMenuPage.userMenuButton, 'User menu button should be visible after sign in');
+    // Verify user is signed in (user menu button should be visible)
+    await userMenuPage.waitForUserMenu();
+    const isSignedIn = await userMenuPage.isUserSignedIn();
+    expect(isSignedIn).toBe(true);
   });
 
   /**
    * TC-002: Failed sign in with invalid credentials
    */
   test('should show error with invalid credentials', async ({ page }) => {
-    // Open auth modal
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
-
-    // Switch to sign in tab
     await authModalPage.switchToSignIn();
 
-    // Fill in invalid credentials
+    // Fill in invalid credentials (random email that doesn't exist)
     await authModalPage.fillSignInForm(
       authHelpers.generateTestEmail(),
       authHelpers.generateTestPassword()
     );
 
-    // Submit form
     await authModalPage.clickSignIn();
 
     // Wait for error message
@@ -88,50 +89,26 @@ test.describe('Sign In - Email and Password', () => {
 
   /**
    * TC-003: Failed sign in with wrong password
+   * First create a user, then try to sign in with wrong password
    */
   test('should show error with correct email but wrong password', async ({ page }) => {
-    // Open auth modal
+    const testUser = authHelpers.generateValidSignupData();
+    const wrongPassword = 'WrongPassword123!';
+
+    // Create user first
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
+    await authModalPage.switchToSignUp();
+    await authModalPage.fillSignUpForm(testUser.email, testUser.password);
+    await authModalPage.clickSignUp();
+    await authModalPage.waitForSuccessMessage();
+    await authModalPage.closeSuccessMessage();
 
-    // Switch to sign in tab
-    await authModalPage.switchToSignIn();
-
-    // Fill in email with wrong password
-    await authModalPage.fillSignInForm(
-      'test@example.com',
-      'WrongPassword123!'
-    );
-
-    // Submit form
-    await authModalPage.clickSignIn();
-
-    // Wait for error message
-    await authModalPage.waitForErrorMessage();
-
-    // Verify error message
-    const errorMessage = await authModalPage.getErrorMessage();
-    expect(errorMessage).toContain('Invalid login credentials');
-  });
-
-  /**
-   * TC-004: Failed sign in with non-existent email
-   */
-  test('should show error with non-existent email', async ({ page }) => {
-    // Open auth modal
+    // Try to sign in with wrong password
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
-
-    // Switch to sign in tab
     await authModalPage.switchToSignIn();
-
-    // Fill in non-existent email
-    await authModalPage.fillSignInForm(
-      'nonexistent@example.com',
-      'SomePassword123!'
-    );
-
-    // Submit form
+    await authModalPage.fillSignInForm(testUser.email, wrongPassword);
     await authModalPage.clickSignIn();
 
     // Wait for error message
@@ -143,14 +120,31 @@ test.describe('Sign In - Email and Password', () => {
   });
 
   /**
+   * TC-004: Failed sign in with non-existent email
+   */
+  test('should show error with non-existent email', async ({ page }) => {
+    await homePage.clickSignIn();
+    await authModalPage.waitForModal();
+    await authModalPage.switchToSignIn();
+
+    await authModalPage.fillSignInForm(
+      'nonexistent@example.com',
+      'SomePassword123!'
+    );
+
+    await authModalPage.clickSignIn();
+    await authModalPage.waitForErrorMessage();
+
+    const errorMessage = await authModalPage.getErrorMessage();
+    expect(errorMessage).toBeTruthy();
+  });
+
+  /**
    * TC-005: Form validation for empty fields
    */
   test('should disable sign in button with empty fields', async ({ page }) => {
-    // Open auth modal
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
-
-    // Switch to sign in tab
     await authModalPage.switchToSignIn();
 
     // Check button is disabled with empty fields
@@ -172,21 +166,16 @@ test.describe('Sign In - Email and Password', () => {
    * TC-006: Form validation for invalid email format
    */
   test('should validate email format', async ({ page }) => {
-    // Open auth modal
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
-
-    // Switch to sign in tab
     await authModalPage.switchToSignIn();
 
-    // Try to fill invalid email
     const invalidEmails = authHelpers.generateInvalidEmails();
 
     for (const invalidEmail of invalidEmails.slice(0, 3)) {
       await authModalPage.fillInput(authModalPage.signInEmailInput, invalidEmail);
       await authModalPage.fillInput(authModalPage.signInPasswordInput, 'Password123!');
 
-      // Browser's HTML5 validation should prevent submission
       const emailInput = authModalPage.signInEmailInput;
       const isValid = await emailInput.evaluate(el => (el as HTMLInputElement).checkValidity());
       expect(isValid).toBe(false);
@@ -197,42 +186,47 @@ test.describe('Sign In - Email and Password', () => {
    * TC-007: Sign in modal opens and closes correctly
    */
   test('should open and close sign in modal', async ({ page }) => {
-    // Verify modal is closed initially
     expect(await authModalPage.isOpen()).toBe(false);
 
-    // Open modal
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
     expect(await authModalPage.isOpen()).toBe(true);
 
-    // Close modal
     await authModalPage.closeByEscape();
     await authModalPage.waitForModalClose();
     expect(await authModalPage.isOpen()).toBe(false);
   });
 
   /**
-   * TC-008: Sign in redirects correctly after success
+   * TC-008: Sign in shows user menu after success
    */
   test('should reload page and show user menu after sign in', async ({ page }) => {
-    // Open auth modal
+    const testUser = authHelpers.generateValidSignupData();
+
+    // Create user first
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
+    await authModalPage.switchToSignUp();
+    await authModalPage.fillSignUpForm(testUser.email, testUser.password);
+    await authModalPage.clickSignUp();
+    await authModalPage.waitForSuccessMessage();
+    await authModalPage.closeSuccessMessage();
 
-    // Switch to sign in tab
+    // Sign in
+    await homePage.clickSignIn();
+    await authModalPage.waitForModal();
     await authModalPage.switchToSignIn();
-
-    // Fill in credentials
-    await authModalPage.fillSignInForm('test@example.com', 'TestPass123!');
-
-    // Submit form (this will likely fail in test without actual user)
+    await authModalPage.fillSignInForm(testUser.email, testUser.password);
     await authModalPage.clickSignIn();
 
-    // After successful sign in, page should reload and user menu should appear
-    // In real test with actual user, this would pass
-    await page.waitForTimeout(2000);
+    // Wait for page reload after successful sign-in
+    await page.waitForLoadState('networkidle');
 
-    // Check if we're still on home page or were redirected
+    // User menu should be visible
+    await userMenuPage.waitForUserMenu();
+    expect(await userMenuPage.isUserSignedIn()).toBe(true);
+
+    // Verify we're still on home page
     const currentUrl = page.url();
     expect(currentUrl).toContain('localhost');
   });
@@ -285,14 +279,11 @@ test.describe('Sign In Modal - UI Elements', () => {
    * TC-012: Tabs switch correctly between sign in and sign up
    */
   test('should switch tabs correctly', async ({ page }) => {
-    // Start on sign in tab
     expect(await authModalPage.isSignInTabActive()).toBe(true);
 
-    // Switch to sign up
     await authModalPage.switchToSignUp();
     expect(await authModalPage.isSignUpTabActive()).toBe(true);
 
-    // Switch back to sign in
     await authModalPage.switchToSignIn();
     expect(await authModalPage.isSignInTabActive()).toBe(true);
   });
@@ -304,25 +295,41 @@ test.describe('Sign In - Integration', () => {
   let authModalPage: AuthModalPage;
   let userMenuPage: UserMenuPage;
 
+  test.beforeEach(async ({ page }) => {
+    homePage = new HomePage(page);
+    authModalPage = new AuthModalPage(page);
+    userMenuPage = new UserMenuPage(page);
+  });
+
   /**
    * TC-013: User can sign out after signing in
    */
   test('should allow sign out after successful sign in', async ({ page }) => {
+    const testUser = authHelpers.generateValidSignupData();
+
     await homePage.goto();
     await homePage.waitForLoaded();
 
-    // Open auth modal and sign in
+    // Create user
     await homePage.clickSignIn();
     await authModalPage.waitForModal();
+    await authModalPage.switchToSignUp();
+    await authModalPage.fillSignUpForm(testUser.email, testUser.password);
+    await authModalPage.clickSignUp();
+    await authModalPage.waitForSuccessMessage();
+    await authModalPage.closeSuccessMessage();
 
+    // Sign in
+    await homePage.clickSignIn();
+    await authModalPage.waitForModal();
     await authModalPage.switchToSignIn();
-    await authModalPage.fillSignInForm('test@example.com', 'TestPass123!');
+    await authModalPage.fillSignInForm(testUser.email, testUser.password);
     await authModalPage.clickSignIn();
 
-    // Wait for potential sign in
-    await page.waitForTimeout(2000);
+    // Wait for sign in
+    await page.waitForLoadState('networkidle');
 
-    // If sign in successful, check sign out works
+    // Verify signed in, then sign out
     if (await userMenuPage.isUserSignedIn()) {
       await userMenuPage.openMenu();
       await userMenuPage.clickSignOut();

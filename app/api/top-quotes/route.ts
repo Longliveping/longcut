@@ -3,7 +3,7 @@ import { TranscriptSegment, VideoInfo } from '@/lib/types';
 import { withSecurity } from '@/lib/security-middleware';
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { generateAIResponse } from '@/lib/ai-client';
-import { topQuotesSchema } from '@/lib/schemas';
+import { topQuotesSchema, topQuotesWrapperSchema } from '@/lib/schemas';
 import { formatTranscriptWithTimestamps, formatVideoInfoBlock } from '@/lib/prompts/takeaways';
 import { getLanguageName } from '@/lib/language-utils';
 
@@ -69,13 +69,16 @@ async function handler(request: NextRequest) {
 
     const prompt = basePrompt.replace('</task>', `${languageInstruction}</task>`);
 
+    // Use wrapper schema for OpenAI (requires object at root level)
     const response = await generateAIResponse(prompt, {
-      zodSchema: topQuotesSchema,
+      zodSchema: topQuotesWrapperSchema,
       temperature: 0.4
     });
 
     const parsed = JSON.parse(response);
-    const validation = topQuotesSchema.safeParse(parsed);
+    // Extract quotes from wrapper schema response { quotes: [...] }
+    const quotesData = (parsed as any)?.quotes || parsed;
+    const validation = topQuotesSchema.safeParse(quotesData);
 
     if (!validation.success) {
       console.error('Top quotes validation failed:', validation.error.flatten());

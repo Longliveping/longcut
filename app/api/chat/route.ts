@@ -9,7 +9,7 @@ import { withSecurity } from '@/lib/security-middleware';
 import { generateAIResponse } from '@/lib/ai-client';
 import { chatResponseSchema } from '@/lib/schemas';
 import { getLanguageName } from '@/lib/language-utils';
-import { requireSession } from '@/lib/auth/server';
+import { getSession } from '@/lib/auth/server';
 
 function formatTranscriptForContext(segments: TranscriptSegment[]): string {
   return segments.map(s => {
@@ -93,9 +93,9 @@ async function handler(request: NextRequest) {
 
     const { message, transcript, topics, chatHistory, targetLanguage } = validatedData;
 
-    // Check rate limiting
-    const session = await requireSession();
-    const user = session.user;
+    // Check rate limiting - use getSession to allow anonymous users
+    const session = await getSession();
+    const user = session?.user;
     const rateLimitConfig = user ? RATE_LIMITS.AUTH_CHAT : RATE_LIMITS.ANON_CHAT;
     const rateLimitResult = await RateLimiter.check('chat', rateLimitConfig);
 

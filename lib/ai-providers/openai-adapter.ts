@@ -34,15 +34,39 @@ function describeError(error: any): string {
   return 'unknown error';
 }
 
+// Track if schema has any optional fields for strict mode compatibility
+let hasOptionalFields = false;
+
+/**
+ * Checks if a schema has optional properties (properties that exist but aren't required)
+ */
+function hasOptionalProperties(schema: any): boolean {
+  if (schema?.type === 'object' && schema?.properties) {
+    const propertyKeys = Object.keys(schema.properties);
+    const requiredKeys = schema.required || [];
+    // If there are properties that aren't in required, we have optional fields
+    return propertyKeys.some(key => !requiredKeys.includes(key));
+  }
+  return false;
+}
+
 /**
  * Ensures all object schemas have `additionalProperties: false` as required
  * by OpenAI's structured outputs API.
+ *
+ * IMPORTANT: OpenAI's strict mode requires:
+ * 1. additionalProperties: false on all objects
+ * 2. ALL properties in properties must be in the required array
+ * 3. nullable fields are NOT supported in strict mode
+ *
+ * For optional fields, we set strict: false since OpenAI strict mode
+ * doesn't properly support optional/nullable properties.
  */
-function addAdditionalProperties(schema: any): any {
+function addAdditionalProperties(schema: any, parentKey?: string): any {
   if (!schema || typeof schema !== 'object') return schema;
 
   if (Array.isArray(schema)) {
-    return schema.map(addAdditionalProperties);
+    return schema.map((item: any) => addAdditionalProperties(item));
   }
 
   const result: Record<string, any> = { ...schema };
@@ -56,7 +80,7 @@ function addAdditionalProperties(schema: any): any {
   if (schema.properties) {
     result.properties = {};
     for (const [key, value] of Object.entries(schema.properties)) {
-      result.properties[key] = addAdditionalProperties(value);
+      result.properties[key] = addAdditionalProperties(value, key);
     }
   }
 
@@ -65,33 +89,46 @@ function addAdditionalProperties(schema: any): any {
   }
 
   // Handle anyOf/oneOf by converting nullable types
+  // For OpenAI strict mode: optional fields should NOT use nullable
+  // Instead, they should just not be in the required array
   if (schema.anyOf || schema.oneOf) {
     const schemas = schema.anyOf || schema.oneOf;
     const nonNullSchemas = schemas.filter((s: any) => s.type !== 'null');
 
+    // Mark that we have an optional field
+    hasOptionalFields = true;
+
     if (nonNullSchemas.length === 1) {
-      const converted = addAdditionalProperties(nonNullSchemas[0]);
-      if (converted && typeof converted === 'object') {
-        converted.nullable = true;
-      }
-      return converted;
+      // Return the non-null schema WITHOUT nullable flag
+      // The parent object's required array will exclude this field
+      return addAdditionalProperties(nonNullSchemas[0]);
     }
 
     if (nonNullSchemas.length > 0) {
       return addAdditionalProperties(nonNullSchemas[0]);
     }
 
-    // If only null schema remains, return a simple nullable string
-    return { type: 'string', nullable: true };
+    // If only null schema remains, return a simple string
+    return { type: 'string' };
   }
 
   return result;
 }
 
-function convertToOpenAISchema(zodSchema: z.ZodTypeAny): any {
+function convertToOpenAISchema(zodSchema: z.ZodTypeAny): { schema: any; hasOptionalFields: boolean } {
   try {
+    // Reset the flag before conversion
+    hasOptionalFields = false;
     const jsonSchema = z.toJSONSchema(zodSchema);
-    return addAdditionalProperties(jsonSchema);
+    console.log('[OpenAI] Original JSON schema:', JSON.stringify(jsonSchema, null, 2));
+    const converted = addAdditionalProperties(jsonSchema);
+    console.log('[OpenAI] Converted schema:', JSON.stringify(converted, null, 2));
+
+    // Check if the schema has optional properties (not all properties are required)
+    const hasOptional = hasOptionalProperties(converted) || hasOptionalFields;
+    console.log('[OpenAI] Has optional fields:', hasOptional);
+
+    return { schema: converted, hasOptionalFields: hasOptional };
   } catch (error) {
     console.error('[OpenAI] Failed to convert Zod schema to JSON schema', error);
     throw new Error(
@@ -130,6 +167,8 @@ function createTimeoutPromise(timeoutMs: number): Promise<never> {
 
 export function createOpenaiAdapter(): ProviderAdapter {
   const apiKey = process.env.OPENAI_API_KEY;
+  console.log('[OpenAI Adapter] OPENAI_API_KEY exists:', !!apiKey);
+  console.log('[OpenAI Adapter] All env vars starting with OPENAI:', Object.keys(process.env).filter(k => k.startsWith('OPENAI')));
   if (!apiKey) {
     throw new Error(
       'OPENAI_API_KEY is required to use the OpenAI provider. Set the environment variable and try again.'
@@ -173,15 +212,21 @@ export function createOpenaiAdapter(): ProviderAdapter {
           }
 
           if (params.zodSchema) {
-            const jsonSchema = convertToOpenAISchema(params.zodSchema);
+            const { schema: jsonSchema, hasOptionalFields } = convertToOpenAISchema(params.zodSchema);
+            // OpenAI's strict mode doesn't properly support optional/nullable fields
+            // When optional fields exist, we disable strict mode
+            const useStrict = !hasOptionalFields;
             requestOptions.response_format = {
               type: 'json_schema',
               json_schema: {
                 name: params.schemaName || 'ResponseSchema',
                 schema: jsonSchema,
-                strict: true,
+                strict: useStrict,
               },
             };
+            if (!useStrict) {
+              console.log('[OpenAI] Disabling strict mode due to optional fields in schema');
+            }
           }
 
           const requestStart = Date.now();

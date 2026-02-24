@@ -30,6 +30,13 @@ export const summaryTakeawaySchema = z.object({
   timestamps: z.array(z.string().regex(timestampPattern)).min(1).max(2)
 });
 
+// For OpenAI structured outputs, we need to wrap arrays in objects
+// because OpenAI only supports type: "object" at the root level
+export const summaryTakeawaysWrapperSchema = z.object({
+  takeaways: z.array(summaryTakeawaySchema).min(4).max(6)
+});
+
+// Keep the original for compatibility with non-OpenAI providers
 export const summaryTakeawaysSchema = z.array(summaryTakeawaySchema).min(4).max(6);
 
 export const quickPreviewSchema = z.object({
@@ -42,4 +49,10 @@ export const topQuoteSchema = z.object({
   timestamp: z.string().regex(timestampPattern)
 });
 
+// For OpenAI structured outputs, we need to wrap arrays in objects
+export const topQuotesWrapperSchema = z.object({
+  quotes: z.array(topQuoteSchema).min(1).max(5)
+});
+
+// Keep the original for compatibility with non-OpenAI providers
 export const topQuotesSchema = z.array(topQuoteSchema).min(1).max(5);

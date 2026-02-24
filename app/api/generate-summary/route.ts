@@ -3,7 +3,7 @@ import { TranscriptSegment, VideoInfo } from '@/lib/types';
 import { withSecurity } from '@/lib/security-middleware';
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { generateAIResponse } from '@/lib/ai-client';
-import { summaryTakeawaysSchema } from '@/lib/schemas';
+import { summaryTakeawaysSchema, summaryTakeawaysWrapperSchema } from '@/lib/schemas';
 import { normalizeTimestampSources } from '@/lib/timestamp-normalization';
 import { buildTakeawaysPrompt } from '@/lib/prompts/takeaways';
 import { getLanguageName } from '@/lib/language-utils';
@@ -258,9 +258,11 @@ async function handler(request: NextRequest) {
     let response: string;
 
     try {
+      // Use wrapper schema for OpenAI (requires object at root level)
+      // The wrapper contains { takeaways: [...] }
       response = await generateAIResponse(prompt, {
         temperature: 0.6,
-        zodSchema: summaryTakeawaysSchema
+        zodSchema: summaryTakeawaysWrapperSchema
       });
 
       // Diagnostic logging for debugging JSON parsing issues
@@ -286,7 +288,10 @@ async function handler(request: NextRequest) {
     try {
       console.log('[Stage 1] Attempting direct parse with preprocessing...');
       const parsed = safeJsonParse(response);
-      const normalized = normalizeTakeawaysPayload(parsed);
+
+      // Extract takeaways from wrapper schema response { takeaways: [...] }
+      const takeawaysData = (parsed as any)?.takeaways || parsed;
+      const normalized = normalizeTakeawaysPayload(takeawaysData);
 
       const validation = summaryTakeawaysSchema.safeParse(normalized);
       if (!validation.success) {

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
 // Users table - compatible with Lucia auth
@@ -59,7 +59,9 @@ export const userVideos = sqliteTable('user_videos', {
   videoAnalysisId: text('video_analysis_id').references(() => videoAnalyses.id),
   isFavorite: integer('is_favorite', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at').notNull(),
-})
+}, (table) => ({
+  uniqueUserVideo: uniqueIndex('unique_user_video').on(table.userId, table.videoAnalysisId)
+}))
 
 export const notes = sqliteTable('notes', {
   id: text('id').primaryKey(),

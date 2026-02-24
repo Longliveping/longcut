@@ -67,8 +67,8 @@ export const topicSchema = z.object({
   segments: z.array(z.object({
     start: z.number().min(0),
     end: z.number().min(0),
-    text: z.string().max(10000),
-    translatedText: z.string().max(20000).optional(),
+    text: z.string().max(50000),
+    translatedText: z.string().max(50000).optional(),
     startSegmentIdx: z.number().int().min(0).optional(),
     endSegmentIdx: z.number().int().min(0).optional(),
     startCharOffset: z.number().int().min(0).optional(),

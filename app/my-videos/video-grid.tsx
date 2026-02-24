@@ -25,11 +25,11 @@ interface VideoAnalysis {
 interface UserVideo {
   id: string;
   user_id: string;
-  video_id: string;
+  video_id: string | null;
   accessed_at: string;
   is_favorite: boolean;
   notes: string | null;
-  video: VideoAnalysis;
+  video: VideoAnalysis | null;
 }
 
 interface VideoGridProps {
@@ -61,8 +61,10 @@ export function VideoGrid({ videos }: VideoGridProps) {
   const [updatingFavorites, setUpdatingFavorites] = useState<Set<string>>(new Set());
 
   const filteredVideos = videos.filter(userVideo => {
-    const matchesSearch = userVideo.video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          userVideo.video.author?.toLowerCase().includes(searchQuery.toLowerCase());
+    const video = userVideo.video;
+    if (!video) return false;
+    const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          video.author?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFavorite = !showFavorites || favoriteStatuses[userVideo.id];
     return matchesSearch && matchesFavorite;
   });
@@ -158,10 +160,12 @@ export function VideoGrid({ videos }: VideoGridProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredVideos.map((userVideo) => {
-          const slug = buildCanonicalSlug(userVideo.video);
+          const video = userVideo.video;
+          if (!video) return null;
+          const slug = buildCanonicalSlug(video);
           const href = slug
             ? `/v/${slug}`
-            : `/analyze/${userVideo.video.youtube_id}?cached=true`;
+            : `/analyze/${video.youtube_id}?cached=true`;
 
           return (
             <Link
@@ -171,10 +175,10 @@ export function VideoGrid({ videos }: VideoGridProps) {
             >
               <div className="rounded-lg overflow-hidden border bg-card hover:shadow-lg transition-shadow duration-200">
                 <div className="relative aspect-video bg-muted">
-                  {userVideo.video.thumbnail_url && (
+                  {video.thumbnail_url && (
                   <Image
-                    src={userVideo.video.thumbnail_url}
-                    alt={userVideo.video.title}
+                    src={video.thumbnail_url}
+                    alt={video.title}
                     fill
                     className="object-cover"
                   />
@@ -185,13 +189,13 @@ export function VideoGrid({ videos }: VideoGridProps) {
                   </div>
                 </div>
                 <div className="absolute bottom-1.5 right-1.5 bg-black/80 text-white px-1.5 py-0.5 rounded text-[11px]">
-                  {formatDuration(userVideo.video.duration)}
+                  {formatDuration(video.duration)}
                 </div>
                 {user && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={(e) => handleToggleFavorite(e, userVideo.id, userVideo.video.youtube_id)}
+                    onClick={(e) => handleToggleFavorite(e, userVideo.id, video.youtube_id)}
                     disabled={updatingFavorites.has(userVideo.id)}
                     className="absolute top-1.5 right-1.5 h-7 w-7 bg-black/60 hover:bg-black/80 border-0 transition-all"
                     aria-label={favoriteStatuses[userVideo.id] ? 'Remove from favorites' : 'Add to favorites'}
@@ -213,11 +217,11 @@ export function VideoGrid({ videos }: VideoGridProps) {
 
               <div className="p-3.5">
                 <h3 className="text-sm font-semibold line-clamp-2 mb-1.5 group-hover:text-primary transition-colors">
-                  {userVideo.video.title}
+                  {video.title}
                 </h3>
 
                 <p className="text-xs text-muted-foreground mb-2.5 line-clamp-1">
-                  {userVideo.video.author}
+                  {video.author}
                 </p>
 
                 <div className="flex items-center justify-between text-[11px] text-muted-foreground">
@@ -226,9 +230,9 @@ export function VideoGrid({ videos }: VideoGridProps) {
                     <span>{formatDate(userVideo.accessed_at)}</span>
                   </div>
 
-                  {userVideo.video.topics && (
+                  {video.topics && (
                     <div className="flex items-center gap-1">
-                      <span className="font-medium">{userVideo.video.topics.length}</span>
+                      <span className="font-medium">{video.topics.length}</span>
                       <span>highlights</span>
                     </div>
                   )}

@@ -58,12 +58,9 @@ async function handler(req: NextRequest) {
       );
     }
 
-    // Convert integer to boolean for response
-    const isFavoriteBool = result.isFavorite === 1;
-
     return NextResponse.json({
       success: true,
-      isFavorite: isFavoriteBool
+      isFavorite: result.isFavorite
     });
 
   } catch (error) {

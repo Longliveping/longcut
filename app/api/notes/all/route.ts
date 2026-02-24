@@ -62,8 +62,8 @@ async function handler(req: NextRequest) {
       // Fetch all notes for the user
       const notes = await getAllNotes(userId);
 
-      // Get unique video IDs from notes
-      const videoIds = [...new Set(notes.map(note => note.videoId))];
+      // Get unique video IDs from notes (filter out null values)
+      const videoIds = [...new Set(notes.map(note => note.videoId).filter((id): id is string => id !== null))];
 
       // Fetch all videos in parallel
       const videos = await Promise.all(
@@ -89,7 +89,7 @@ async function handler(req: NextRequest) {
 
       // Map notes with video data, sorting by created_at descending
       const notesWithVideo = notes
-        .map(note => mapNoteWithVideo(note as NoteRow, videoMap.get(note.videoId) || null))
+        .map(note => mapNoteWithVideo(note as NoteRow, note.videoId ? (videoMap.get(note.videoId) || null) : null))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       return NextResponse.json({ notes: notesWithVideo });

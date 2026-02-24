@@ -58,8 +58,8 @@ export class AuthModalPage extends BasePage {
     this.signUpButton = this.modal.locator('button', { hasText: 'Create Account' }).first();
     this.googleSignUpButton = page.locator('button:has-text("Continue with Google")');
 
-    // Success state
-    this.successMessage = page.locator('[role="dialog"]:has-text("Check your email")');
+    // Success state (Lucia shows "Account created!" in dialog)
+    this.successMessage = page.locator('[role="dialog"]:has-text("Account created!")');
     this.successCloseButton = page.locator('[role="dialog"] button:has-text("Got it")');
 
     // Error state
@@ -139,6 +139,8 @@ export class AuthModalPage extends BasePage {
   async fillSignInForm(email: string, password: string): Promise<void> {
     await this.fillInput(this.signInEmailInput, email);
     await this.fillInput(this.signInPasswordInput, password);
+    // Wait for React state to update and button to become enabled
+    await this.page.waitForTimeout(100);
   }
 
   /**
@@ -147,6 +149,8 @@ export class AuthModalPage extends BasePage {
   async fillSignUpForm(email: string, password: string): Promise<void> {
     await this.fillInput(this.signUpEmailInput, email);
     await this.fillInput(this.signUpPasswordInput, password);
+    // Wait for React state to update and button to become enabled
+    await this.page.waitForTimeout(100);
   }
 
   /**
@@ -200,6 +204,13 @@ export class AuthModalPage extends BasePage {
    */
   async isSuccessMessageVisible(): Promise<boolean> {
     return await this.isVisible(this.successMessage);
+  }
+
+  /**
+   * Wait for success message to appear
+   */
+  async waitForSuccessMessage(): Promise<void> {
+    await this.waitForVisible(this.successMessage);
   }
 
   /**

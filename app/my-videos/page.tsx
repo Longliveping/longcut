@@ -21,11 +21,11 @@ interface VideoAnalysis {
 interface UserVideo {
   id: string;
   user_id: string;
-  video_id: string;
+  video_id: string | null;
   accessed_at: string;
   is_favorite: boolean;
   notes: string | null;
-  video: VideoAnalysis;
+  video: VideoAnalysis | null;
 }
 
 export default async function MyVideosPage() {

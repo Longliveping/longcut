@@ -79,7 +79,7 @@ export async function linkVideoToUser(userId: string, videoAnalysisId: string) {
     id: crypto.randomUUID(),
     userId,
     videoAnalysisId,
-    isFavorite: 0,
+    isFavorite: false,
     createdAt: now,
   }
   await db.insert(userVideos).values(link).onConflictDoNothing()
@@ -109,7 +109,7 @@ export async function toggleVideoFavorite(userId: string, videoAnalysisId: strin
     return null
   }
 
-  const newFavorite = existing[0].isFavorite === 0 ? 1 : 0
+  const newFavorite = existing[0].isFavorite ? false : true
   const result = await db.update(userVideos)
     .set({ isFavorite: newFavorite })
     .where(and(
@@ -132,11 +132,9 @@ export async function setVideoFavorite(
       eq(userVideos.videoAnalysisId, videoAnalysisId)
     ))
 
-  const isFavoriteInt = isFavorite ? 1 : 0
-
   if (existing[0]) {
     const result = await db.update(userVideos)
-      .set({ isFavorite: isFavoriteInt })
+      .set({ isFavorite })
       .where(and(
         eq(userVideos.userId, userId),
         eq(userVideos.videoAnalysisId, videoAnalysisId)
@@ -149,7 +147,7 @@ export async function setVideoFavorite(
       id: crypto.randomUUID(),
       userId,
       videoAnalysisId,
-      isFavorite: isFavoriteInt,
+      isFavorite,
       createdAt: now,
     }
     const result = await db.insert(userVideos)

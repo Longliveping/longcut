@@ -114,7 +114,7 @@ export async function getUserSubscriptionStatus(
         : null,
       cancelAtPeriodEnd: Boolean(user.cancelAtPeriodEnd),
       topupCredits: Number(user.topupCredits ?? 0),
-      userCreatedAt: user.createdAt,
+      userCreatedAt: user.createdAt ? Math.floor(new Date(user.createdAt).getTime() / 1000) : null,
     };
   } catch (error) {
     console.error('Error fetching subscription:', error);
@@ -366,11 +366,12 @@ export async function consumeVideoCreditAtomic({
         subscription.tier === 'pro';
 
       if (shouldConsumeTopup) {
+        const nowStr = new Date().toISOString();
         await db
           .update(users)
           .set({
             topupCredits: sql`${users.topupCredits} - 1`,
-            updatedAt: now,
+            updatedAt: nowStr,
           })
           .where(eq(users.id, userId));
         usedTopup = true;
@@ -432,12 +433,12 @@ export async function addTopupCredits(
   }
 
   try {
-    const now = Math.floor(Date.now() / 1000);
+    const nowStr = new Date().toISOString();
     await db
       .update(users)
       .set({
         topupCredits: sql`${users.topupCredits} + ${amount}`,
-        updatedAt: now,
+        updatedAt: nowStr,
       })
       .where(eq(users.id, userId));
 
@@ -465,11 +466,11 @@ export async function createOrRetrieveStripeCustomer(
 
     // For local deployment without Stripe, return a placeholder
     const customerId = `cus_${userId}`;
-    const now = Math.floor(Date.now() / 1000);
+    const nowStr = new Date().toISOString();
 
     await db
       .update(users)
-      .set({ stripeCustomerId: customerId, updatedAt: now })
+      .set({ stripeCustomerId: customerId, updatedAt: nowStr })
       .where(eq(users.id, userId));
 
     return { customerId };

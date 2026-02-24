@@ -13,6 +13,16 @@ export default defineConfig({
   // Test directory
   testDir: './e2e/auth/tests',
 
+  // Web server configuration - automatically start dev server before tests
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    timeout: 120000, // 2 minutes to start
+    reuseExistingServer: true, // Always reuse existing server if available
+    stdout: 'pipe',
+    stderr: 'pipe',
+  },
+
   // Test file matching
   testMatch: '**/*.spec.ts',
 

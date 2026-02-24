@@ -7,50 +7,76 @@
  * Sign in with email and password
  */
 export async function signIn(email: string, password: string) {
-  const response = await fetch('/api/auth/sign-in', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({ email, password }),
-  })
+  try {
+    const response = await fetch('/api/auth/sign-in', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ email, password }),
+    })
 
-  const data = await response.json()
+    let data
+    try {
+      data = await response.json()
+    } catch {
+      data = {}
+    }
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || 'Sign in failed',
+      }
+    }
+
+    return { success: true, user: data.user }
+  } catch (error) {
+    console.error('Sign-in fetch error:', error)
     return {
       success: false,
-      error: data.error || 'Sign in failed',
+      error: 'Network error. Please check your connection.',
     }
   }
-
-  return { success: true, user: data.user }
 }
 
 /**
  * Sign up with email, password, and name
  */
 export async function signUp(email: string, password: string, name: string) {
-  const response = await fetch('/api/auth/sign-up', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({ email, password, name }),
-  })
+  try {
+    const response = await fetch('/api/auth/sign-up', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ email, password, name }),
+    })
 
-  const data = await response.json()
+    let data
+    try {
+      data = await response.json()
+    } catch {
+      data = {}
+    }
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || 'Sign up failed',
+      }
+    }
+
+    return { success: true, user: data.user }
+  } catch (error) {
+    console.error('Sign-up fetch error:', error)
     return {
       success: false,
-      error: data.error || 'Sign up failed',
+      error: 'Network error. Please check your connection.',
     }
   }
-
-  return { success: true, user: data.user }
 }
 
 /**

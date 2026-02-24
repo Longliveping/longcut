@@ -16,7 +16,7 @@ const getNotesQuerySchema = z.object({
 interface NoteRow {
   id: string;
   userId: string;
-  videoId: string;
+  videoId: string | null;
   source: string;
   sourceId: string | null;
   text: string;

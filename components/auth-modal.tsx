@@ -40,44 +40,56 @@ export function AuthModal({ open, onOpenChange, onSuccess, trigger = 'manual', c
     setLoading(true)
     setError(null)
 
-    const result = await signUp(email, password, 'User')
+    try {
+      const result = await signUp(email, password, 'User')
 
-    if (!result.success) {
-      setError(result.error ?? 'Signup failed')
-      toast.error(result.error ?? 'Signup failed')
-    } else {
-      setSuccess(true)
-      toast.success('Account created! Please sign in.')
+      if (!result.success) {
+        setError(result.error ?? 'Signup failed')
+        toast.error(result.error ?? 'Signup failed')
+      } else {
+        setSuccess(true)
+        toast.success('Account created! Please sign in.')
+      }
+    } catch (error) {
+      console.error('Sign-up error:', error)
+      setError('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleSignIn = async () => {
     setLoading(true)
     setError(null)
 
-    // Store current video ID in sessionStorage before signing in
-    if (currentVideoId) {
-      sessionStorage.setItem('pendingVideoId', currentVideoId)
+    try {
+      // Store current video ID in sessionStorage before signing in
+      if (currentVideoId) {
+        sessionStorage.setItem('pendingVideoId', currentVideoId)
+      }
+
+      const result = await signIn(email, password)
+
+      if (!result.success) {
+        setError(result.error ?? 'Sign in failed')
+        toast.error(result.error ?? 'Sign in failed')
+      } else {
+        toast.success('Successfully signed in!')
+        onSuccess?.()
+        onOpenChange(false)
+        // Reload to update auth state
+        setTimeout(() => {
+          window.location.reload()
+        }, 100)
+      }
+    } catch (error) {
+      console.error('Sign-in error:', error)
+      setError('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
+    } finally {
+      setLoading(false)
     }
-
-    const result = await signIn(email, password)
-
-    if (!result.success) {
-      setError(result.error ?? 'Sign in failed')
-      toast.error(result.error ?? 'Sign in failed')
-    } else {
-      toast.success('Successfully signed in!')
-      onSuccess?.()
-      onOpenChange(false)
-      // Reload to update auth state
-      setTimeout(() => {
-        window.location.reload()
-      }, 100)
-    }
-
-    setLoading(false)
   }
 
   const getModalContent = () => {

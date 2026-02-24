@@ -7,11 +7,11 @@ export async function createUser(data: {
   passwordHash: string
   name?: string
 }) {
-  const now = Math.floor(Date.now() / 1000)
+  const now = new Date().toISOString()
   const user = {
     id: crypto.randomUUID(),
     email: data.email,
-    emailVerified: false,
+    emailVerified: 0,
     passwordHash: data.passwordHash,
     name: data.name || null,
     image: null,
@@ -33,7 +33,7 @@ export async function getUserById(id: string) {
 }
 
 export async function updateUser(userId: string, data: { name?: string }) {
-  const now = Math.floor(Date.now() / 1000)
+  const now = new Date().toISOString()
   const result = await db.update(users)
     .set({ ...data, updatedAt: now })
     .where(eq(users.id, userId))

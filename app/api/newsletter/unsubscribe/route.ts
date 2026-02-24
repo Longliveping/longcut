@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // Update user's newsletter subscription preference
     await db
       .update(users)
-      .set({ updatedAt: Math.floor(Date.now() / 1000) })
+      .set({ updatedAt: new Date().toISOString() })
       .where(eq(users.id, userId));
 
     return NextResponse.json({ success: true });

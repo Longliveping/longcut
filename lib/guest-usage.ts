@@ -49,7 +49,7 @@ export async function getGuestAccessState(): Promise<GuestAccessState> {
       const data = await db
         .select({ id: rateLimits.id })
         .from(rateLimits)
-        .where(eq(rateLimits.key, GUEST_RATE_KEY))
+        .where(eq(rateLimits.identifier, GUEST_RATE_KEY))
         .limit(100) // Get recent entries and check client-side
 
       // Check if any of our identifiers match
@@ -103,7 +103,8 @@ export async function recordGuestUsage(
 
   const rows = state.identifiers.map((identifier) => ({
     id: crypto.randomUUID(),
-    key: GUEST_RATE_KEY,
+    key: `guest:${identifier}`,
+    action: 'video_generation',
     identifier,
     timestamp: now
   }))

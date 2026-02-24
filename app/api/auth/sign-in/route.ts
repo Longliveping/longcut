@@ -84,5 +84,6 @@ async function handler(req: Request) {
 export const POST = withSecurity(handler, {
   rateLimit: RATE_LIMITS.AUTH_ATTEMPT,
   maxBodySize: 1024, // 1KB - email + password
-  allowedMethods: ['POST']
+  allowedMethods: ['POST'],
+  csrfProtection: false // Sign-in is a public endpoint, CSRF not needed
 })

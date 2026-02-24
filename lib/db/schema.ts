@@ -96,6 +96,7 @@ export const imageGenerations = sqliteTable('image_generations', {
 
 export const rateLimits = sqliteTable('rate_limits', {
   id: text('id').primaryKey(),
+  key: text('key').notNull(), // Composite key for rate limiting (e.g., "ratelimit:video_generation:user:xxx")
   identifier: text('identifier').notNull(), // IP address, user ID, or session token
   action: text('action').notNull(), // 'video_generation', 'image_generation', etc.
   timestamp: integer('timestamp').notNull(),
